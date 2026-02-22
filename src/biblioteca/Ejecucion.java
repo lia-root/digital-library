@@ -1,14 +1,61 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
+
 package biblioteca;
+
+import java.util.Scanner;
 
 /**
  *
  * @author ceci
  */
 public class Ejecucion {
+    
+    public static void menu(){
+        boolean continuar_ejecucion = true;
+        Scanner sc = new Scanner(System.in);
+        
+        while(continuar_ejecucion){
+        
+        IO.println("Elija una opcion");
+        IO.println("1. Ingresa libro");
+        IO.println("2. Ingresa usuario");
+        IO.println("3. Eliminar usuario ");
+        IO.println("4. Ver historial");
+        IO.println("5. salir ");
+        
+        int respuesta = 0;
+        if(sc.hasNext()){
+            respuesta = sc.nextInt();
+        }else{
+            sc.next();
+                respuesta = -1;
+            }
+            
+        switch (respuesta) {
+            case 1:
+                IO.println("seleccionaste 1");
+                break;
+             case 2:
+                  IO.println("seleccionaste 21"
+                          + "");
+               
+                break;
+             case 3:
+                  IO.println("seleccionaste 3");
+             
+                break;
+             case 4:
+                 IO.println("seleccionaste 4");
+                
+                break;
+             case 5:
+                 continuar_ejecucion = false;
+                 IO.println("Adios");
+                break;
+            default:
+                IO.println("Respuesta invalida");
+                }
+        }
+    }
     
     public static void ejecutarDemo() {
         
@@ -91,4 +138,8 @@ public class Ejecucion {
             System.out.println("Capturado (argumento invalido): " + e.getMessage());
         }
     } 
+
+    private static void registrar_usuarios() {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    }
 }

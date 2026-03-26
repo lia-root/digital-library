@@ -13,22 +13,6 @@ public class Miembro extends Cuenta {
         this.misReservas = new ArrayList<>();
     }
 
-    public void buscar_libro(Catalogo catalogo, String criterio) {
-        if (catalogo == null)
-            throw new IllegalArgumentException("Se espera un Catalogo para 'catalogo', no puede ser nulo");
-        if (criterio == null || criterio.isBlank())
-            throw new IllegalArgumentException("Se espera una cadena para 'criterio', no puede ser nula o vacia");
-        List<Libro> resultados = catalogo.buscarPorCriterio(criterio);
-        if (resultados.isEmpty()) {
-            System.out.println("No se encontraron libros para: " + criterio);
-        } else {
-            System.out.println("Resultados para '" + criterio + "':");
-            for (Libro l : resultados) {
-                if (l != null) l.ficha_bibliografica();
-            }
-        }
-    }
-
     public void reservar_libro(Libro libro, Catalogo catalogo, String fecha_inicio, String fecha_fin) {
         if (!"activo".equalsIgnoreCase(status))
             throw new IllegalStateException("No puede reservar: su cuenta no esta"

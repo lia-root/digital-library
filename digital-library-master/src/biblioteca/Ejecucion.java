@@ -137,7 +137,9 @@ public class Ejecucion {
         IO.println("2. Crear usuario");
         IO.println("3. Eliminar usuario ");
         IO.println("4. Consulta usuarios");
-        IO.println("5. Regresar al inicio de sesion");
+        IO.println("5. Ver catalogo");
+        IO.println("6. Buscar libro");
+        IO.println("7. Regresar al inicio de sesion");
                
         int respuesta = 0;
         if(sc.hasNext()){
@@ -164,61 +166,21 @@ public class Ejecucion {
               
                 break;
              case 5:
-                 log_in();
+                 show_books();
                  
+                break;
+            case 6:
+                buscar_libro();
+
+                break;
+            case 7:
+                log_in();
+
                 break;
             default:
                 IO.println("Respuesta invalida");
                 }
         }
-    }
-     
-    public static void ejecutarDemo() {
-        
-     /*   Catalogo catalogo = new Catalogo();
-
-        // Crear administrador y agregar libros
-       Administrador admin = new Administrador("admin", "1234", "admin@biblio.com", "administrador");
-        Libro libro1 = new Libro("Garcia Marquez", "2020", "Norma", "Ficcion");
-        Libro libro2 = new Libro("Borges", "2018", "Emece", "Literatura");
-        Libro libro3 = new Libro("Isabel Allende", "2022", "Plaza & Janes", "Ficcion");
-
-        admin.agregar_libro(catalogo, libro1);
-        admin.agregar_libro(catalogo, libro2);
-        admin.agregar_libro(catalogo, libro3);
-
-        System.out.println("\n--- Catalogo ---");
-        catalogo.mostrar_libros();
-
-        // Crear miembro
-        Miembro miembro = new Miembro("maria", "pass123", "maria@mail.com", "miembro");
-
-        System.out.println("\n--- Busqueda ---");
-        miembro.buscar_libro(catalogo, "Ficcion");
-
-        System.out.println("\n--- Reserva ---");
-        miembro.reservar_libro(libro1, catalogo, "2025-02-18", "2025-02-25");
-        miembro.reservar_libro(libro2, catalogo, "2025-02-20", "2025-03-01");
-
-        System.out.println("\n--- Lectura ---");
-        miembro.leer_libro(libro3);
-        libro3.pasar_pagina();
-        libro3.pasar_pagina();
-        libro3.cerrar();
-
-        System.out.println("\n--- Historial del miembro ---");
-        miembro.historial();
-
-        System.out.println("\n--- Consulta de usuario (admin) ---");
-        admin.consultar_usuario(miembro);
-
-        System.out.println("\n--- Validacion de cuentas ---");
-        System.out.println("Admin valido: " + admin.validar_usuario());
-        System.out.println("Miembro valido: " + miembro.validar_usuario());
-
-        // Demo: manejo de errores
-        System.out.println("\n--- Demostracion de manejo de errores ---");
-        demostrarManejoErrores(catalogo, libro1);*/
     }
 
     private static void demostrarManejoErrores(Catalogo catalogo, Libro libro1) {
@@ -341,27 +303,67 @@ public class Ejecucion {
             IO.println("No se encontraron coincidencias");
             return;
         }
-        for (int i=0;i<=resultado.size()-1; i++){
-            IO.println("Libro # "+ i);
+        for (int i=0;i<=resultado.size()-1; i++) {
+            IO.println("Libro # " + i);
             resultado.get(i).ficha_bibliografica();
         }
+        if(usuario_actual instanceof Administrador && resultado.size()!=0){
+            edit_book(resultado);
+        }
+    }
+    public static void edit_book(ArrayList<Libro> resultado){
         IO.println("Seleccione una opcion:");
-        IO.println("1. Reservar libro");
-        IO.println("2.Volver al menu principal");
-        Scanner Rrespuesta = new Scanner(System.in);
-        String reserv = Rrespuesta.nextLine();
+        IO.println("1.Editar libro");
+        IO.println("2.Eliminar libro");
+        IO.println("3.Volver al menu principal");
 
-        switch (reserv) {
+        Scanner Rrespuesta = new Scanner(System.in);
+        String edit= Rrespuesta.nextLine();
+
+        switch (edit) {
             case "1":
-                IO.println("Ingrese el numero de libro: ");
+                IO.println("Ingrese el id del libro a editar: ");
                 Scanner librores = new Scanner(System.in);
                 int respuesta = librores.nextInt();
-                Miembro uno = (Miembro) usuario_actual;
-                uno.reservar_libro(resultado.get(respuesta),nuevobusqueda,"2026-02-22", "2026-03-22");
+
+                break;
+            case "2":
+                IO.println("Ingrese el id del libro a eliminar: ");
+                Scanner librodell = new Scanner(System.in);
+                int respuestadell = librodell.nextInt();
+
+                break;
+            case "3":
                 break;
             default:
         }
     }
+    public static void reescribir_datos_libro(ArrayList<Libro> resultado){
+
+        IO.println("Ingresa nombre del autor:");
+        Scanner scanerautor = new Scanner(System.in);
+        String auntor = scanerautor.nextLine();
+
+        IO.println("Ingresa año de publicacion:");
+        Scanner scanernanio = new Scanner(System.in);
+        String anio = scanernanio.nextLine();
+
+        IO.println("Ingresa el nombre editorial:");
+        Scanner scanereditorial = new Scanner(System.in);
+        String editorial = scanereditorial.nextLine();
+
+        IO.println("Categoria de libro:");
+        Scanner scanerncetegoria = new Scanner(System.in);
+        String categoria = scanerncetegoria.nextLine();
+
+        IO.println("Ingresa titulo del libro:");
+        Scanner scanertitulo = new Scanner(System.in);
+        String titulo = scanertitulo.nextLine();
+
+        Libro libro = new Libro(auntor, anio, editorial, categoria,titulo);
+        mislibros.add(libro);
+    }
+
     public static void historial(){
         Miembro nuevo = (Miembro) usuario_actual;
         nuevo.historial();

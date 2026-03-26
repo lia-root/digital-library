@@ -1,7 +1,6 @@
 
 package biblioteca;
 
-import static biblioteca.Ejecucion.ejecutarDemo;
 
 /**
  *

@@ -1,30 +1,29 @@
 package views;
 
 import helpers.ShowMessageHelper;
-import models.Administrador;
-import models.Cuenta;
 import models.Libro;
-import models.Miembro;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-
-import static views.Usuarios.refreshTable;
+import java.util.Date;
 
 public class Libros {
     public static void showUserPanel() {
         JFrame window = new JFrame("Panel de Libros");
-        window.setSize(500, 400);
+        window.setSize(900, 560);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setLayout(new FlowLayout());
+        window.setLocationRelativeTo(null);
+        window.setLayout(new BorderLayout(12, 12));
 
         JLabel titleLabel = new JLabel("Registro de libros");
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        titleLabel.setBorder(new EmptyBorder(8, 4, 0, 4));
 
         JLabel bookTitleLabel = new JLabel("Titulo");
         JTextField bookTitleTextBox = new JTextField(15);
@@ -36,8 +35,9 @@ public class Libros {
         JTextField editorialTextBox = new JTextField(15);
 
         JLabel publicationDateLabel = new JLabel("Fecha de publicacion");
-        JDate
-        JTextField  publicationDateTextBox = new JTextField(15);
+        JSpinner publicationDateSpinner = new JSpinner(new SpinnerDateModel());
+        publicationDateSpinner.setEditor(new JSpinner.DateEditor(publicationDateSpinner, "dd-MM-yyyy"));
+        publicationDateSpinner.setValue(new Date());
 
         JLabel bookCategoryLabel = new JLabel("Categoria");
         JTextField categoryTextBox = new JTextField(15);
@@ -45,6 +45,12 @@ public class Libros {
 
         JButton addBookButton = new JButton("Agregar");
         JButton updateTableButton = new JButton("Actualizar");
+        addBookButton.setBackground(new Color(46, 139, 87));
+        addBookButton.setForeground(Color.WHITE);
+        addBookButton.setFocusPainted(false);
+        updateTableButton.setBackground(new Color(70, 130, 180));
+        updateTableButton.setForeground(Color.WHITE);
+        updateTableButton.setFocusPainted(false);
 
         // Modelo de tabla
         DefaultTableModel modelo = new DefaultTableModel();
@@ -58,25 +64,27 @@ public class Libros {
 
         // Tabla
         JTable tabla = new JTable(modelo);
+        tabla.setRowHeight(24);
+        tabla.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        tabla.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 13));
+        tabla.setSelectionBackground(new Color(220, 238, 255));
+        tabla.setSelectionForeground(Color.BLACK);
         JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setPreferredSize(new Dimension(450, 200));
+        scroll.setBorder(BorderFactory.createTitledBorder("Listado de libros"));
 
-        addBookButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                boolean textBoxEmpty = bookTitleTextBox.getText().isEmpty() || authorTextBox.getText().isEmpty() || editorialTextBox.getText().isEmpty()
-                        || publicationDateTextBox.getText().isEmpty() || categoryTextBox.getText().isEmpty();
-                if(textBoxEmpty) {
-                    ShowMessageHelper.showWarningMessage("Porfavor, llena todos los campos");
-                }else {
-                    addBook(bookTitleTextBox.getText(), authorTextBox.getText(), editorialTextBox.getText(), publicationDateTextBox.getText(), categoryTextBox.getText(),  modelo);
-                    bookTitleTextBox.setText("");
-                    authorTextBox.setText("");
-                    editorialTextBox.setText("");
-                    publicationDateTextBox.setText("");
-                    categoryTextBox.setText("");
-
-                    ShowMessageHelper.showWarningMessage("revisa los archivos");
-                }
+        addBookButton.addActionListener(e -> {
+            String publicationDate = new SimpleDateFormat("dd-MM-yyyy").format((Date) publicationDateSpinner.getValue());
+            boolean textBoxEmpty = bookTitleTextBox.getText().isEmpty() || authorTextBox.getText().isEmpty() || editorialTextBox.getText().isEmpty()
+                    || publicationDate.isEmpty() || categoryTextBox.getText().isEmpty();
+            if (textBoxEmpty) {
+                ShowMessageHelper.showWarningMessage("Por favor, llena todos los campos");
+            } else {
+                addBook(bookTitleTextBox.getText(), authorTextBox.getText(), editorialTextBox.getText(), publicationDate, categoryTextBox.getText(),  modelo);
+                bookTitleTextBox.setText("");
+                authorTextBox.setText("");
+                editorialTextBox.setText("");
+                categoryTextBox.setText("");
+                publicationDateSpinner.setValue(new Date());
             }
         });
 
@@ -84,12 +92,19 @@ public class Libros {
         tabla.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int fila = tabla.getSelectedRow();
-                String rol = modelo.getValueAt(fila, 5).toString();
+                if (fila == -1) {
+                    return;
+                }
 
                 bookTitleTextBox.setText(modelo.getValueAt(fila, 1).toString());
                 authorTextBox.setText(modelo.getValueAt(fila, 2).toString());
                 editorialTextBox.setText(modelo.getValueAt(fila, 3).toString());
-                publicationDateTextBox.setText(modelo.getValueAt(fila, 4).toString());
+                try {
+                    Date parsedDate = new SimpleDateFormat("dd-MM-yyyy").parse(modelo.getValueAt(fila, 4).toString());
+                    publicationDateSpinner.setValue(parsedDate);
+                } catch (Exception ex) {
+                    publicationDateSpinner.setValue(new Date());
+                }
                 categoryTextBox.setText(modelo.getValueAt(fila, 5).toString());
             }
         });
@@ -102,16 +117,17 @@ public class Libros {
                 modelo.setValueAt(bookTitleTextBox.getText(), fila, 1);
                 modelo.setValueAt(authorTextBox.getText(), fila, 2);
                 modelo.setValueAt(editorialTextBox.getText(), fila, 3);
-                modelo.setValueAt(publicationDateTextBox.getText(), fila, 4);
+                String publicationDate = new SimpleDateFormat("dd-MM-yyyy").format((Date) publicationDateSpinner.getValue());
+                modelo.setValueAt(publicationDate, fila, 4);
                 modelo.setValueAt(categoryTextBox.getText(), fila, 5);
 
-                updateBook(modelo.getValueAt(fila, 0).toString(), bookTitleTextBox.getText(), boorAuthorLabel.getText(), editorialTextBox.getText(),publicationDateTextBox.getText(), categoryTextBox.getText());
+                updateBook(modelo.getValueAt(fila, 0).toString(), bookTitleTextBox.getText(), authorTextBox.getText(), editorialTextBox.getText(), publicationDate, categoryTextBox.getText());
 
                 bookTitleTextBox.setText("");
                 authorTextBox.setText("");
                 editorialTextBox.setText("");
-                publicationDateTextBox.setText("");
                 categoryTextBox.setText("");
+                publicationDateSpinner.setValue(new Date());
 
             } else {
                 ShowMessageHelper.showWarningMessage("Selecciona una fila");
@@ -120,22 +136,48 @@ public class Libros {
 
         refreshTable(modelo);
 
-        window.add(titleLabel);
-        window.add(titleLabel);
-        window.add(bookTitleLabel);
-        window.add(bookTitleTextBox);
-        window.add(boorAuthorLabel);
-        window.add(authorTextBox);
-        window.add(bookEditorialLabel);
-        window.add(editorialTextBox);
-        window.add(publicationDateLabel);
-        window.add(publicationDateTextBox);
-        window.add(bookCategoryLabel);
-        window.add(categoryTextBox);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBorder(new EmptyBorder(8, 12, 0, 12));
+        topPanel.add(titleLabel, BorderLayout.WEST);
 
-        window.add(addBookButton);
-        window.add(updateTableButton);
-        window.add(scroll);
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(new EmptyBorder(0, 12, 0, 12));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0; gbc.gridy = 0; formPanel.add(bookTitleLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(bookTitleTextBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0; formPanel.add(boorAuthorLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(authorTextBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0; formPanel.add(bookEditorialLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(editorialTextBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0; formPanel.add(publicationDateLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(publicationDateSpinner, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0; formPanel.add(bookCategoryLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(categoryTextBox, gbc);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        buttonPanel.setBorder(new EmptyBorder(8, 0, 8, 0));
+        buttonPanel.add(addBookButton);
+        buttonPanel.add(updateTableButton);
+
+        JPanel formAndButtonsPanel = new JPanel(new BorderLayout());
+        formAndButtonsPanel.add(formPanel, BorderLayout.CENTER);
+        formAndButtonsPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBorder(new EmptyBorder(0, 12, 12, 12));
+        centerPanel.add(formAndButtonsPanel, BorderLayout.NORTH);
+        centerPanel.add(scroll, BorderLayout.CENTER);
+
+        window.add(topPanel, BorderLayout.NORTH);
+        window.add(centerPanel, BorderLayout.CENTER);
 
         window.setVisible(true);
     }

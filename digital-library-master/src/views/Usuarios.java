@@ -1,39 +1,44 @@
 package views;
 
-import java.awt.Dimension;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.BorderFactory;
 import javax.swing.JButton;
-import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import helpers.ShowMessageHelper;
 import models.Administrador;
 import models.Cuenta;
-import models.Miembro;
 
 public class Usuarios {
 	public static void showUserPanel() {
 		JFrame window = new JFrame("Panel de usuarios");
-        window.setSize(500, 400);
+        window.setSize(900, 560);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        window.setLayout(new FlowLayout());
+        window.setLocationRelativeTo(null);
+        window.setLayout(new BorderLayout(12, 12));
 
         JLabel titleLabel = new JLabel("Registrar nuevo usuario");
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        titleLabel.setBorder(new EmptyBorder(8, 4, 0, 4));
 
         JLabel fullNameLabel = new JLabel("Nombre completo");
         JTextField fullNameTextBox = new JTextField(15);
@@ -49,6 +54,12 @@ public class Usuarios {
 
         JButton addUserButton = new JButton("Agregar");
         JButton updateTableButton = new JButton("Actualizar");
+        addUserButton.setBackground(new Color(46, 139, 87));
+        addUserButton.setForeground(Color.WHITE);
+        addUserButton.setFocusPainted(false);
+        updateTableButton.setBackground(new Color(70, 130, 180));
+        updateTableButton.setForeground(Color.WHITE);
+        updateTableButton.setFocusPainted(false);
 
         // Modelo de tabla
         DefaultTableModel modelo = new DefaultTableModel();
@@ -61,24 +72,26 @@ public class Usuarios {
 
         // Tabla
         JTable tabla = new JTable(modelo);
+        tabla.setRowHeight(24);
+        tabla.setFont(new Font("SansSerif", Font.PLAIN, 13));
+        tabla.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 13));
+        tabla.setSelectionBackground(new Color(220, 238, 255));
+        tabla.setSelectionForeground(Color.BLACK);
         JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setPreferredSize(new Dimension(450, 200));
+        scroll.setBorder(BorderFactory.createTitledBorder("Listado de usuarios"));
         
-        addUserButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-            	boolean textBoxEmpty = fullNameTextBox.getText().isEmpty() || passTextBox.getText().isEmpty() || emailTextBox.getText().isEmpty();
-            	String tipo = adminRadioButton.isSelected() ? "administrador" : "miembro";
+        addUserButton.addActionListener(e -> {
+            boolean textBoxEmpty = fullNameTextBox.getText().isEmpty() || passTextBox.getText().isEmpty() || emailTextBox.getText().isEmpty();
+            String tipo = adminRadioButton.isSelected() ? "administrador" : "miembro";
 
-            	if(textBoxEmpty) {
-            		ShowMessageHelper.showWarningMessage("Los campos Nombre, Correo electronico y Contraseña no deben estar en blanco");
-            	}else {
-            		addUser(fullNameTextBox.getText(), passTextBox.getText(), emailTextBox.getText(), tipo, modelo);
-            		fullNameTextBox.setText("");
-            		passTextBox.setText("");
-            		emailTextBox.setText("");
-            		adminRadioButton.setSelected(false);
-            		ShowMessageHelper.showWarningMessage("revisa los archivos");
-            	}
+            if (textBoxEmpty) {
+                ShowMessageHelper.showWarningMessage("Los campos Nombre, Correo electronico y Contraseña no deben estar en blanco");
+            } else {
+                addUser(fullNameTextBox.getText(), passTextBox.getText(), emailTextBox.getText(), tipo, modelo);
+                fullNameTextBox.setText("");
+                passTextBox.setText("");
+                emailTextBox.setText("");
+                adminRadioButton.setSelected(false);
             }
         });
 
@@ -86,6 +99,10 @@ public class Usuarios {
         tabla.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int fila = tabla.getSelectedRow();
+                if (fila == -1) {
+                    return;
+                }
+
                 String rol = modelo.getValueAt(fila, 4).toString();
 
                 if(rol.equals("administrador")) {
@@ -124,27 +141,54 @@ public class Usuarios {
         
         refreshTable(modelo);
 
-        window.add(titleLabel);
-        window.add(fullNameLabel);
-        window.add(fullNameTextBox);
-        window.add(passLabel);
-        window.add(passTextBox);
-        window.add(emailLabel);
-        window.add(emailTextBox);
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBorder(new EmptyBorder(8, 12, 0, 12));
+        topPanel.add(titleLabel, BorderLayout.WEST);
 
-        window.add(adminLabel);
-        window.add(adminRadioButton);
-        window.add(addUserButton);
-        window.add(updateTableButton);
-        window.add(scroll);
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        formPanel.setBorder(new EmptyBorder(0, 12, 0, 12));
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(6, 6, 6, 6);
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0; gbc.gridy = 0; formPanel.add(fullNameLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(fullNameTextBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1; gbc.weightx = 0; formPanel.add(passLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(passTextBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2; gbc.weightx = 0; formPanel.add(emailLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(emailTextBox, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0; formPanel.add(adminLabel, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(adminRadioButton, gbc);
+
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+        buttonPanel.setBorder(new EmptyBorder(8, 0, 8, 0));
+        buttonPanel.add(addUserButton);
+        buttonPanel.add(updateTableButton);
+
+        JPanel formAndButtonsPanel = new JPanel(new BorderLayout());
+        formAndButtonsPanel.add(formPanel, BorderLayout.CENTER);
+        formAndButtonsPanel.add(buttonPanel, BorderLayout.SOUTH);
+
+        JPanel centerPanel = new JPanel(new BorderLayout());
+        centerPanel.setBorder(new EmptyBorder(0, 12, 12, 12));
+        centerPanel.add(formAndButtonsPanel, BorderLayout.NORTH);
+        centerPanel.add(scroll, BorderLayout.CENTER);
+
+        window.add(topPanel, BorderLayout.NORTH);
+        window.add(centerPanel, BorderLayout.CENTER);
 
         window.setVisible(true);
 	}
 
 	private static void addUser(String nombre, String contra, String correo, String tipo, DefaultTableModel modelo) {
-	         Administrador administrador = new Administrador(nombre, contra, correo, tipo);
-	         administrador.guardarUsuario();
-	     refreshTable(modelo);
+	    Administrador administrador = new Administrador(nombre, contra, correo, tipo);
+	    administrador.guardarUsuario();
+
+	    refreshTable(modelo);
 	}
 
 	private static void updateUser(String id, String nombre, String contra, String correo, String tipo) {

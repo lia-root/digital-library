@@ -13,18 +13,28 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+/**
+ * Vista CRUD de libros: formulario, tabla y persistencia vía modelo {@link Libro}.
+ */
 public class Libros {
+    /**
+     * Arma la ventana completa: título, formulario en rejilla, botones y tabla con scroll.
+     */
     public static void showUserPanel() {
+        // Contenedor principal de la pantalla de libros.
         JFrame window = new JFrame("Panel de Libros");
         window.setSize(900, 560);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null);
+        // Gaps horizontales/verticales entre regiones NORTH y CENTER.
         window.setLayout(new BorderLayout(12, 12));
 
+        // Encabezado de sección (solo texto, región norte).
         JLabel titleLabel = new JLabel("Registro de libros");
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         titleLabel.setBorder(new EmptyBorder(8, 4, 0, 4));
 
+        // Campos de texto por columna del libro (coinciden con columnas de tabla más abajo).
         JLabel bookTitleLabel = new JLabel("Titulo");
         JTextField bookTitleTextBox = new JTextField(15);
 
@@ -34,6 +44,7 @@ public class Libros {
         JLabel bookEditorialLabel = new JLabel("Editorial");
         JTextField editorialTextBox = new JTextField(15);
 
+        // Fecha con JSpinner + modelo de fecha: evita texto libre y formatea con DateEditor.
         JLabel publicationDateLabel = new JLabel("Fecha de publicacion");
         JSpinner publicationDateSpinner = new JSpinner(new SpinnerDateModel());
         publicationDateSpinner.setEditor(new JSpinner.DateEditor(publicationDateSpinner, "dd-MM-yyyy"));
@@ -52,7 +63,7 @@ public class Libros {
         updateTableButton.setForeground(Color.WHITE);
         updateTableButton.setFocusPainted(false);
 
-        // Modelo de tabla
+        // DefaultTableModel: filas dinámicas; columnas definidas manualmente.
         DefaultTableModel modelo = new DefaultTableModel();
 
         modelo.addColumn("ID");
@@ -62,7 +73,6 @@ public class Libros {
         modelo.addColumn("Publicacion");
         modelo.addColumn("Categoria");
 
-        // Tabla
         JTable tabla = new JTable(modelo);
         tabla.setRowHeight(24);
         tabla.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -72,6 +82,7 @@ public class Libros {
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(BorderFactory.createTitledBorder("Listado de libros"));
 
+        // Alta: convierte la fecha del spinner a String con el mismo patrón que el editor.
         addBookButton.addActionListener(e -> {
             String publicationDate = new SimpleDateFormat("dd-MM-yyyy").format((Date) publicationDateSpinner.getValue());
             boolean textBoxEmpty = bookTitleTextBox.getText().isEmpty() || authorTextBox.getText().isEmpty() || editorialTextBox.getText().isEmpty()
@@ -88,7 +99,7 @@ public class Libros {
             }
         });
 
-        // CARGAR DATOS AL HACER CLICK EN LA TABLA
+        // Clic en fila: rellena el formulario para editar; -1 = ninguna fila válida.
         tabla.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int fila = tabla.getSelectedRow();
@@ -109,7 +120,7 @@ public class Libros {
             }
         });
 
-        // EDITAR
+        // Actualizar fila seleccionada en modelo y en archivo vía Libro.actualizarLibro.
         updateTableButton.addActionListener(e -> {
             int fila = tabla.getSelectedRow();
 
@@ -134,12 +145,14 @@ public class Libros {
             }
         });
 
+        // Carga inicial desde disco/archivo según implementación de Libro.obtenerLibros().
         refreshTable(modelo);
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(new EmptyBorder(8, 12, 0, 12));
         topPanel.add(titleLabel, BorderLayout.WEST);
 
+        // Formulario: GridBagConstraints.weightx=1 en columna 1 estira los JTextField.
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(new EmptyBorder(0, 12, 0, 12));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -162,11 +175,13 @@ public class Libros {
         gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0; formPanel.add(bookCategoryLabel, gbc);
         gbc.gridx = 1; gbc.weightx = 1; formPanel.add(categoryTextBox, gbc);
 
+        // Botones alineados a la derecha bajo el formulario.
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBorder(new EmptyBorder(8, 0, 8, 0));
         buttonPanel.add(addBookButton);
         buttonPanel.add(updateTableButton);
 
+        // Formulario + botones en NORTH del centro; tabla en CENTER ocupa el resto (scroll).
         JPanel formAndButtonsPanel = new JPanel(new BorderLayout());
         formAndButtonsPanel.add(formPanel, BorderLayout.CENTER);
         formAndButtonsPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -182,12 +197,19 @@ public class Libros {
         window.setVisible(true);
     }
 
+    /**
+     * Crea un {@link Libro}, lo persiste y refresca la tabla.
+     */
     private static void addBook(String titulo, String autor, String editorial,String expedicion, String categoria, DefaultTableModel modelo) {
             Libro libro = new Libro(titulo, autor, editorial, expedicion, categoria);
             libro.guardarLibro();
 
         refreshTable(modelo);
     }
+
+    /**
+     * Delega la actualización al modelo; captura Error para mostrar mensaje (patrón actual del proyecto).
+     */
     private static void updateBook(String id, String titulo, String autor, String editorial,String expedicion, String categoria) {
         try {
             Libro.actualizarLibro(id, titulo, autor, editorial, expedicion,categoria);
@@ -195,9 +217,11 @@ public class Libros {
             ShowMessageHelper.showErrorMessage(e.getMessage());
         }
     }
-    //CAda vez que se agrega, actualzia la tabla
+
+    /**
+     * Vuelve a leer la lista desde el modelo y repuebla filas (setRowCount(0) limpia sin bucle manual).
+     */
     public static void refreshTable(DefaultTableModel modelo) {
-        //for(int i = 0; i< modelo.getRowCount(); i++) modelo.removeRow(i);
         modelo.setRowCount(0);
 
         ArrayList<Libro> libros = Libro.obtenerLibros();

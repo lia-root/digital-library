@@ -28,7 +28,13 @@ import helpers.ShowMessageHelper;
 import models.Administrador;
 import models.Cuenta;
 
+/**
+ * Vista de gestión de cuentas de usuario: alta, edición en tabla y sincronización con archivos vía {@link Cuenta}.
+ */
 public class Usuarios {
+    /**
+     * Construye la ventana con el mismo patrón visual que {@link Libros}: norte título, centro formulario+botones, tabla abajo.
+     */
 	public static void showUserPanel() {
 		JFrame window = new JFrame("Panel de usuarios");
         window.setSize(900, 560);
@@ -43,12 +49,14 @@ public class Usuarios {
         JLabel fullNameLabel = new JLabel("Nombre completo");
         JTextField fullNameTextBox = new JTextField(15);
 
+        // JPasswordField oculta caracteres; en tabla se muestra "******" por seguridad.
         JLabel passLabel = new JLabel("Contraseña");
         JPasswordField passTextBox = new JPasswordField(15);
 
         JLabel emailLabel = new JLabel("Correo electronico");
         JTextField emailTextBox = new JTextField(15);
 
+        // Radio sin grupo: solo indica si el nuevo/actualizado usuario es administrador o miembro.
         JLabel adminLabel = new JLabel("Marque si este usuario es un administrador");
         JRadioButton adminRadioButton = new JRadioButton();
 
@@ -61,7 +69,6 @@ public class Usuarios {
         updateTableButton.setForeground(Color.WHITE);
         updateTableButton.setFocusPainted(false);
 
-        // Modelo de tabla
         DefaultTableModel modelo = new DefaultTableModel();
 
         modelo.addColumn("ID");
@@ -70,7 +77,6 @@ public class Usuarios {
         modelo.addColumn("Correo electronico");
         modelo.addColumn("Rol");
 
-        // Tabla
         JTable tabla = new JTable(modelo);
         tabla.setRowHeight(24);
         tabla.setFont(new Font("SansSerif", Font.PLAIN, 13));
@@ -80,6 +86,7 @@ public class Usuarios {
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(BorderFactory.createTitledBorder("Listado de usuarios"));
         
+        // Alta: tipo según radio; Administrador guarda vía clase Administrador (patrón existente).
         addUserButton.addActionListener(e -> {
             boolean textBoxEmpty = fullNameTextBox.getText().isEmpty() || passTextBox.getText().isEmpty() || emailTextBox.getText().isEmpty();
             String tipo = adminRadioButton.isSelected() ? "administrador" : "miembro";
@@ -95,7 +102,7 @@ public class Usuarios {
             }
         });
 
-        // CARGAR DATOS AL HACER CLICK EN LA TABLA
+        // Doble uso: cargar datos al formulario; bloquea edición si la fila es otro administrador.
         tabla.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int fila = tabla.getSelectedRow();
@@ -116,7 +123,7 @@ public class Usuarios {
             }
         });
 
-        // EDITAR
+        // Edición: la columna contraseña en tabla pasa a "******" visualmente; el modelo sigue usando passTextBox real al persistir.
         updateTableButton.addActionListener(e -> {
             int fila = tabla.getSelectedRow();
 
@@ -184,6 +191,9 @@ public class Usuarios {
         window.setVisible(true);
 	}
 
+    /**
+     * Instancia {@link Administrador} y delega el guardado; luego refresca la tabla.
+     */
 	private static void addUser(String nombre, String contra, String correo, String tipo, DefaultTableModel modelo) {
 	    Administrador administrador = new Administrador(nombre, contra, correo, tipo);
 	    administrador.guardarUsuario();
@@ -191,6 +201,9 @@ public class Usuarios {
 	    refreshTable(modelo);
 	}
 
+    /**
+     * Persiste cambios vía {@link Cuenta#actualizarUsuario}; errores se muestran al usuario.
+     */
 	private static void updateUser(String id, String nombre, String contra, String correo, String tipo) {
 		try {
 			Cuenta.actualizarUsuario(id, nombre, contra, correo, tipo);
@@ -199,8 +212,10 @@ public class Usuarios {
 		}
 	}
 
+    /**
+     * Reconstruye filas desde la fuente de datos; contraseña mostrada como máscara fija.
+     */
 	public static void refreshTable(DefaultTableModel modelo) {
-		//for(int i = 0; i< modelo.getRowCount(); i++) modelo.removeRow(i);
 		modelo.setRowCount(0);
 
 		ArrayList<Cuenta> cuentas = Cuenta.obtenerUsuarios();

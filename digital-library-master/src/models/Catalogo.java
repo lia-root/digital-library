@@ -1,5 +1,7 @@
 package models;
 
+import helpers.UpsertDataHelper;
+
 import java.util.ArrayList;
 
 public class Catalogo {

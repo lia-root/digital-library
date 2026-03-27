@@ -131,6 +131,7 @@ public class Usuarios {
         window.add(passTextBox);
         window.add(emailLabel);
         window.add(emailTextBox);
+
         window.add(adminLabel);
         window.add(adminRadioButton);
         window.add(addUserButton);
@@ -141,14 +142,8 @@ public class Usuarios {
 	}
 
 	private static void addUser(String nombre, String contra, String correo, String tipo, DefaultTableModel modelo) {
-	     if (tipo.equals("administrador")){
 	         Administrador administrador = new Administrador(nombre, contra, correo, tipo);
 	         administrador.guardarUsuario();
-	     }else{
-	          Miembro miembro = new Miembro(nombre, contra, correo, tipo);
-	          miembro.guardarUsuario();
-	     }
-
 	     refreshTable(modelo);
 	}
 
@@ -160,7 +155,7 @@ public class Usuarios {
 		}
 	}
 
-	private static void refreshTable(DefaultTableModel modelo) {
+	public static void refreshTable(DefaultTableModel modelo) {
 		//for(int i = 0; i< modelo.getRowCount(); i++) modelo.removeRow(i);
 		modelo.setRowCount(0);
 
@@ -170,61 +165,4 @@ public class Usuarios {
 			modelo.addRow(new Object[]{ cuenta.getUuid(), cuenta.getUsuario(), "******", cuenta.getCorreo(), cuenta.getTipo()});
 		}
 	}
-
-	public static void ejecutar() {
-        JFrame ventana = new JFrame("Sistema Académico");
-        ventana.setSize(500, 400);
-        ventana.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        ventana.setLayout(new FlowLayout());
-
-        JTextField campoTexto = new JTextField(15);
-
-        JButton btnAgregar = new JButton("Agregar");
-        JButton btnEditar = new JButton("Editar");
-
-        DefaultTableModel modelo = new DefaultTableModel();
-        modelo.addColumn("Nombre");
-
-        JTable tabla = new JTable(modelo);
-        JScrollPane scroll = new JScrollPane(tabla);
-        scroll.setPreferredSize(new Dimension(450, 200));
-
-        // 👉 AGREGAR
-        btnAgregar.addActionListener(e -> {
-            String nombre = campoTexto.getText();
-
-            if (!nombre.isEmpty()) {
-                modelo.addRow(new Object[]{nombre});
-                campoTexto.setText("");
-            }
-        });
-
-        // 👉 CARGAR DATOS AL HACER CLICK EN LA TABLA
-        tabla.addMouseListener(new MouseAdapter() {
-            public void mouseClicked(MouseEvent e) {
-                int fila = tabla.getSelectedRow();
-                campoTexto.setText(modelo.getValueAt(fila, 0).toString());
-            }
-        });
-
-        // 👉 EDITAR
-        btnEditar.addActionListener(e -> {
-            int fila = tabla.getSelectedRow();
-
-            if (fila != -1) {
-                modelo.setValueAt(campoTexto.getText(), fila, 0);
-                campoTexto.setText("");
-            } else {
-                JOptionPane.showMessageDialog(null, "Selecciona una fila");
-            }
-        });
-
-        ventana.add(new JLabel("Nombre:"));
-        ventana.add(campoTexto);
-        ventana.add(btnAgregar);
-        ventana.add(btnEditar);
-        ventana.add(scroll);
-
-        ventana.setVisible(true);
-    }
 }

@@ -1,4 +1,4 @@
-package digital_librery;
+package biblioteca;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;

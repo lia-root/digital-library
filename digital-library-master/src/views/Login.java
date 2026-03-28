@@ -1,12 +1,7 @@
 package views;
 
 // Layouts: BorderLayout divide la ventana en zonas; GridBagLayout alinea filas/columnas con pesos.
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 
 import javax.swing.JButton;
 import javax.swing.BorderFactory;
@@ -19,6 +14,7 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import helpers.ShowMessageHelper;
+import models.Cuenta;
 
 /**
  * Pantalla de inicio de sesión: construye la ventana, valida campos y delega el acceso al menú según credenciales.
@@ -143,8 +139,19 @@ public class Login {
         // Credenciales de ejemplo: si coinciden, se muestra el panel de administración.
         if(user.equals("root") && pass.equals("1234")){
             MenuAdministrador.showMenu("root", "Administrador");
-        }
-
+            return;
+        }else{
+            for(Cuenta item : Cuenta.obtenerUsuarios()) {
+                if (item.getUsuario().equals(user) && item.comparar_contra(pass)) {
+                    if(item.getTipo().equals("administrador")){
+                        MenuAdministrador.showMenu(user, pass);
+                    }else{
+                        //menumiembro
+                    }
+                    return;
+                }
+            }
+        };
         // Mensaje de error cuando las credenciales no son las esperadas.
         ShowMessageHelper.showErrorMessage("Usuario o Contraseña incorrectos");
     }

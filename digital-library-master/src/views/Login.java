@@ -1,10 +1,10 @@
 package views;
 
-// Layouts: BorderLayout divide la ventana en zonas; GridBagLayout alinea filas/columnas con pesos.
+import helpers.CurrentUserHelper;
+import helpers.ShowMessageHelper;
 import java.awt.*;
-
-import javax.swing.JButton;
 import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -12,8 +12,6 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
-
-import helpers.ShowMessageHelper;
 import models.Cuenta;
 
 /**
@@ -139,15 +137,19 @@ public class Login {
         // Credenciales de ejemplo: si coinciden, se muestra el panel de administración.
         if(user.equals("root") && pass.equals("1234")){
             MenuAdministrador.showMenu("root", "Administrador");
+
             return;
         }else{
             for(Cuenta item : Cuenta.obtenerUsuarios()) {
                 if (item.getUsuario().equals(user) && item.comparar_contra(pass)) {
+                    CurrentUserHelper.set(item);
+
                     if(item.getTipo().equals("administrador")){
                         MenuAdministrador.showMenu(user, pass);
                     }else{
                         //menumiembro
                     }
+
                     return;
                 }
             }

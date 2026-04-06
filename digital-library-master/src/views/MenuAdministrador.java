@@ -1,16 +1,16 @@
 package views;
 
+import helpers.CurrentUserHelper;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.FlowLayout;
-
-import javax.swing.JButton;
+import java.awt.Font;
+import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
-import javax.swing.BorderFactory;
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,7 +27,7 @@ public class MenuAdministrador {
      * @param nombreUsuario texto mostrado como identificador
      * @param rol           rol del usuario (p. ej. "Administrador") para mostrarlo junto al nombre
      */
-	public static void showMenu(String nombreUsuario, String rol) {
+	public static void showMenu() {
         // Ventana del menú; tamaño grande para que los botones no queden cortados al abrir.
         JFrame window = new JFrame("Menu de Administrador");
         window.setSize(860, 560);
@@ -43,11 +43,11 @@ public class MenuAdministrador {
         titleLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
         // Textos de sesión (se reubican luego en la esquina superior derecha).
-        JLabel userNameLabel = new JLabel("Usuario: " + nombreUsuario);
+        JLabel userNameLabel = new JLabel("Usuario: " + CurrentUserHelper.get().getUsuario());
         userNameLabel.setFont(new Font("SansSerif", Font.PLAIN, 15));
         userNameLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        JLabel userRoleLabel = new JLabel("Rol:"+ rol);
+        JLabel userRoleLabel = new JLabel("Rol:"+ CurrentUserHelper.get().getTipo());
         userRoleLabel.setFont(new Font("SansSerif", Font.PLAIN, 14));
         userRoleLabel.setForeground(new Color(95, 95, 95));
         userRoleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);

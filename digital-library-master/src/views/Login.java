@@ -136,7 +136,7 @@ public class Login {
     private static void showRolMenu(String user, String pass){
         // Credenciales de ejemplo: si coinciden, se muestra el panel de administración.
         if(user.equals("root") && pass.equals("1234")){
-            MenuAdministrador.showMenu("root", "Administrador");
+            MenuAdministrador.showMenu();
 
             return;
         }else{
@@ -145,7 +145,7 @@ public class Login {
                     CurrentUserHelper.set(item);
 
                     if(item.getTipo().equals("administrador")){
-                        MenuAdministrador.showMenu(user, pass);
+                        MenuAdministrador.showMenu();
                     }else{
                         //menumiembro
                     }

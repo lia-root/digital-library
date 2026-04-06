@@ -1,6 +1,7 @@
 package views;
 
 import helpers.ShowMessageHelper;
+import models.Cuenta;
 import models.Libro;
 
 import javax.swing.*;
@@ -56,12 +57,20 @@ public class Libros {
 
         JButton addBookButton = new JButton("Agregar");
         JButton updateTableButton = new JButton("Actualizar");
+        JButton preeScreenButton = new JButton("Menu anterior");
+        JButton dellBookButton = new JButton("Eliminar");
+
         addBookButton.setBackground(new Color(46, 139, 87));
         addBookButton.setForeground(Color.WHITE);
         addBookButton.setFocusPainted(false);
+
         updateTableButton.setBackground(new Color(70, 130, 180));
         updateTableButton.setForeground(Color.WHITE);
         updateTableButton.setFocusPainted(false);
+
+        dellBookButton.setBackground(new Color(120, 130, 200));
+        dellBookButton.setForeground(Color.WHITE);
+        dellBookButton.setFocusPainted(false);
 
         // DefaultTableModel: filas dinámicas; columnas definidas manualmente.
         DefaultTableModel modelo = new DefaultTableModel();
@@ -96,6 +105,23 @@ public class Libros {
                 editorialTextBox.setText("");
                 categoryTextBox.setText("");
                 publicationDateSpinner.setValue(new Date());
+            }
+        });
+        dellBookButton.addActionListener(e -> {
+            int fila = tabla.getSelectedRow();
+
+            if (fila != -1) {
+                dellBook(modelo.getValueAt(fila, 0).toString(),modelo);
+
+                bookTitleTextBox.setText("");
+                authorTextBox.setText("");
+                editorialTextBox.setText("");
+                categoryTextBox.setText("");
+                publicationDateSpinner.setValue(new Date());
+                ShowMessageHelper.showInfoMessage("Libro eliminado");
+
+            } else {
+                ShowMessageHelper.showWarningMessage("Selecciona una fila");
             }
         });
 
@@ -177,9 +203,11 @@ public class Libros {
 
         // Botones alineados a la derecha bajo el formulario.
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
+
         buttonPanel.setBorder(new EmptyBorder(8, 0, 8, 0));
         buttonPanel.add(addBookButton);
         buttonPanel.add(updateTableButton);
+        buttonPanel.add(dellBookButton);
 
         // Formulario + botones en NORTH del centro; tabla en CENTER ocupa el resto (scroll).
         JPanel formAndButtonsPanel = new JPanel(new BorderLayout());
@@ -217,7 +245,14 @@ public class Libros {
             ShowMessageHelper.showErrorMessage(e.getMessage());
         }
     }
-
+    private static void dellBook(String id, DefaultTableModel modelo){
+        try {
+            Libro.eliminarLibro(id);
+        }catch(Error e){
+            ShowMessageHelper.showErrorMessage(e.getMessage());
+        }
+        refreshTable(modelo);
+    }
     /**
      * Vuelve a leer la lista desde el modelo y repuebla filas (setRowCount(0) limpia sin bucle manual).
      */

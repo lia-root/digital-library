@@ -1,12 +1,6 @@
 package views;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -56,18 +50,31 @@ public class Usuarios {
         JLabel emailLabel = new JLabel("Correo electronico");
         JTextField emailTextBox = new JTextField(15);
 
+
         // Radio sin grupo: solo indica si el nuevo/actualizado usuario es administrador o miembro.
         JLabel adminLabel = new JLabel("Marque si este usuario es un administrador");
         JRadioButton adminRadioButton = new JRadioButton();
 
+        JButton preeScreenButton = new JButton("Menu anterior");
+        JButton dellUserButton = new JButton("Eliminar");
         JButton addUserButton = new JButton("Agregar");
         JButton updateTableButton = new JButton("Actualizar");
+
         addUserButton.setBackground(new Color(46, 139, 87));
         addUserButton.setForeground(Color.WHITE);
         addUserButton.setFocusPainted(false);
+
         updateTableButton.setBackground(new Color(70, 130, 180));
         updateTableButton.setForeground(Color.WHITE);
         updateTableButton.setFocusPainted(false);
+
+        dellUserButton.setBackground(new Color(150, 130, 180));
+        dellUserButton.setForeground(Color.WHITE);
+        dellUserButton.setFocusPainted(false);
+
+        preeScreenButton.setBackground(new Color(70, 130, 180));
+        preeScreenButton.setForeground(Color.WHITE);
+        preeScreenButton.setFocusPainted(false);
 
         DefaultTableModel modelo = new DefaultTableModel();
 
@@ -100,6 +107,23 @@ public class Usuarios {
                 emailTextBox.setText("");
                 adminRadioButton.setSelected(false);
             }
+        });
+
+        dellUserButton.addActionListener(e -> {
+            int fila = tabla.getSelectedRow();
+
+            if (fila != -1) {
+                dellUser(modelo.getValueAt(fila, 0).toString(),modelo);
+
+                fullNameTextBox.setText("");
+                emailTextBox.setText("");
+                passTextBox.setText("");
+                adminRadioButton.setSelected(false);
+                ShowMessageHelper.showInfoMessage("Usuario eliminado");
+            } else {
+                ShowMessageHelper.showWarningMessage("Selecciona una fila");
+            }
+
         });
 
         // Doble uso: cargar datos al formulario; bloquea edición si la fila es otro administrador.
@@ -175,6 +199,8 @@ public class Usuarios {
         buttonPanel.setBorder(new EmptyBorder(8, 0, 8, 0));
         buttonPanel.add(addUserButton);
         buttonPanel.add(updateTableButton);
+        buttonPanel.add(dellUserButton);
+        buttonPanel.add(preeScreenButton);
 
         JPanel formAndButtonsPanel = new JPanel(new BorderLayout());
         formAndButtonsPanel.add(formPanel, BorderLayout.CENTER);
@@ -204,6 +230,7 @@ public class Usuarios {
     /**
      * Persiste cambios vía {@link Cuenta#actualizarUsuario}; errores se muestran al usuario.
      */
+
 	private static void updateUser(String id, String nombre, String contra, String correo, String tipo) {
 		try {
 			Cuenta.actualizarUsuario(id, nombre, contra, correo, tipo);
@@ -212,6 +239,14 @@ public class Usuarios {
 		}
 	}
 
+    private static void dellUser(String id, DefaultTableModel modelo){
+        try {
+            Cuenta.eliminarUsuario(id);
+        }catch(Error e){
+            ShowMessageHelper.showErrorMessage(e.getMessage());
+        }
+        refreshTable(modelo);
+    }
     /**
      * Reconstruye filas desde la fuente de datos; contraseña mostrada como máscara fija.
      */

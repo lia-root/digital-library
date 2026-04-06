@@ -2,6 +2,7 @@ package models;
 
 import java.util.ArrayList;
 
+import helpers.ShowMessageHelper;
 import helpers.UpsertDataHelper;
 
 public class Cuenta {
@@ -106,4 +107,18 @@ public class Cuenta {
 
     	UpsertDataHelper.update(target, nuevasLineas);
     }
+
+	public static void eliminarUsuario(String id) {
+		ArrayList<String> viejasLineas = UpsertDataHelper.read(target);
+		ArrayList<String> nuevasLineas = new ArrayList<>();
+
+		for(String item : viejasLineas) {
+			if (item.contains("id=" + id)) {
+			}
+			else {
+				nuevasLineas.add(item);
+			}
+		}
+		UpsertDataHelper.update(target, nuevasLineas);
+	}
 }

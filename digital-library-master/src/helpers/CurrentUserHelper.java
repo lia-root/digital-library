@@ -7,7 +7,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import models.Administrador;
 import models.Cuenta;
+import models.Miembro;
 
 public class CurrentUserHelper {
     private static String target = "currentUser.txt";
@@ -39,7 +41,7 @@ public class CurrentUserHelper {
                     String correo = newData[2].split("=")[1];
                     String tipo = newData[3].split("=")[1];
 
-                    accountFound = (tipo.equals("administrador")) ? new Administrador(nombre, "", correo, tipo) : new Miembro(nombre, "", correo, tipo);
+                    accountFound = (tipo.equals("administrador")) ? new Administrador(nombre, "x", correo, tipo) : new Miembro(nombre, "x", correo, tipo);
                     accountFound.setUuid(uuid);
                 }
             }
@@ -55,14 +57,14 @@ public class CurrentUserHelper {
 
 		upsertData(
 			data,
-			"Se ha actualizado el usuario en contexto",
-			"A ocurrido un error actualizando al usuario en contexto"
+			"BIENVENIDO",
+			"A ocurrido un error"
 		);
 	}
 
 	private static void upsertData(ArrayList<String> newCurrentUser, String infoMessage, String errorMessage){
 	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(target))) {
-			for (String line : lines) {
+			for (String line : newCurrentUser) {
 	    		writer.write(line);
 	            writer.newLine();
 	        }

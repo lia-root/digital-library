@@ -84,6 +84,19 @@ public class Libro {
 
         UpsertDataHelper.update(target, nuevasLineas);
     }
+    public static void eliminarLibro(String id) {
+        ArrayList<String> viejasLineas = UpsertDataHelper.read(target);
+        ArrayList<String> nuevasLineas = new ArrayList<>();
+
+        for(String item : viejasLineas) {
+            if (item.contains("id=" + id)) {
+            }
+            else {
+                nuevasLineas.add(item);
+            }
+        }
+        UpsertDataHelper.update(target, nuevasLineas);
+    }
     public static ArrayList<Libro> obtenerLibros() {
         ArrayList<String> datos = UpsertDataHelper.read(target);
         ArrayList<Libro> libros = new ArrayList<>();

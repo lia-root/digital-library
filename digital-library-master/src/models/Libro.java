@@ -1,7 +1,6 @@
 package models;
 
 import helpers.UpsertDataHelper;
-
 import java.util.ArrayList;
 
 public class Libro {
@@ -69,7 +68,7 @@ public class Libro {
     public String getUuid() { return this.uuid;}
 
         public void guardarLibro() {
-        UpsertDataHelper.save("titulo="+getLTitulo()+",autor="+getAutor()+",editorial="+getEditorial()+",publicacion="+getExpedicion()+",categoria="+getCategoria(), target);
+        UpsertDataHelper.insert("titulo="+getLTitulo()+",autor="+getAutor()+",editorial="+getEditorial()+",publicacion="+getExpedicion()+",categoria="+getCategoria(), target);
     }
     public static void actualizarLibro(String id, String nuevoTitulo, String nuevoAutor, String nuevaEditorial,String nuevaExpedicion, String nuevaCategoria) {
         ArrayList<String> viejasLineas = UpsertDataHelper.read(target);
@@ -79,9 +78,11 @@ public class Libro {
             if (item.contains("id=" + id)) {
                 item = "id=" + id + ",titulo=" + nuevoTitulo + ",autor=" + nuevoAutor + "" + ",editorial=" + nuevaEditorial + ",publicacion=" + nuevaExpedicion + ",categoria=" + nuevaCategoria;
             }
+
             nuevasLineas.add(item);
         }
-        UpsertDataHelper.actualizarUsuario(target, nuevasLineas);
+
+        UpsertDataHelper.update(target, nuevasLineas);
     }
     public static ArrayList<Libro> obtenerLibros() {
         ArrayList<String> datos = UpsertDataHelper.read(target);

@@ -36,7 +36,32 @@ public class Cuenta {
     public String getUuid() { return this.uuid; }
     
     public void guardarUsuario() {
-		UpsertDataHelper.save("usuario="+getUsuario()+",password="+password+",correo="+getCorreo()+",tipo="+getTipo(), target);
+		if (validarUsuarioExistente()) {
+			ShowMessageHelper.showErrorMessage("Ya existe un usuario con ese nombre o correo");
+		}else{
+			UpsertDataHelper.insert("usuario="+getUsuario()+",password="+password+",correo="+getCorreo()+",tipo="+getTipo(), target);
+		}
+	}
+
+	private boolean validarUsuarioExistente(){
+		ArrayList<String> datos = UpsertDataHelper.read(target);
+		boolean existe = false;
+
+		for(String item : datos) {
+    		String[] data = item.split(",");
+    		String uuid = data[0].split("=")[1];
+    		String nombre = data[1].split("=")[1];
+    		String password = data[2].split("=")[1];
+    		String correo = data[3].split("=")[1];
+    		String tipo = data[4].split("=")[1];
+
+			if (nombre.equals(getUsuario()) || correo.equals(getCorreo())) {
+				existe = true;
+				break;
+			}
+    	}
+
+		return existe;
 	}
 
     public static ArrayList<Cuenta> obtenerUsuarios() {
@@ -79,6 +104,6 @@ public class Cuenta {
     		nuevasLineas.add(item);
     	}
 
-    	UpsertDataHelper.actualizarUsuario(target, nuevasLineas);
+    	UpsertDataHelper.update(target, nuevasLineas);
     }
 }

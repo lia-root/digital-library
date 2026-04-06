@@ -9,50 +9,56 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 public class UpsertDataHelper {
-	public static void save(String texto, String target) {
+	public static void insert(String texto, String target) {
 		ArrayList<String> lines = read(target);
 		lines.add("id="+UUID.randomUUID().toString()+","+texto);
-		
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(target))) {
-	    	 for (String l : lines) {
-	    		 writer.write(l);
-	             writer.newLine();
-	         }
-	    	 ShowMessageHelper.showInfoMessage("Datos guardados correctamente");
-	    	 
-	     } catch (IOException e) {
-	    	 ShowMessageHelper.showErrorMessage("A ocurrido un error guardando los datos");
-	    	 e.printStackTrace();
-	     }
-     }
 
-	 public static ArrayList<String> read(String target) {
-		 ArrayList<String> data = new ArrayList<String>(); 
+		upsertData(
+			target,
+			lines,
+			"Datos guardados correctamente",
+			"A ocurrido un error guardando los datos"
+		);
+    }
 
-		 try (BufferedReader reader = new BufferedReader(new FileReader(target))) {
-			 String linea;
-	         while ((linea = reader.readLine()) != null) {
-	        	 data.add(linea);
-	         }
-	     } catch (IOException e) {
-	    	 ShowMessageHelper.showErrorMessage("No fue posible leer los datos");
-	    	 e.printStackTrace();
-	     }
-		 
-		 return data;
+	public static ArrayList<String> read(String target) {
+		ArrayList<String> data = new ArrayList<String>(); 
+
+		try (BufferedReader reader = new BufferedReader(new FileReader(target))) {
+			String linea;
+
+	        while ((linea = reader.readLine()) != null) {
+				data.add(linea);
+	        }
+	    } catch (IOException e) {
+	    	ShowMessageHelper.showErrorMessage("No fue posible leer los datos");
+	    	e.printStackTrace();
+	    }
+
+		return data;
 	}
 
-	 public static void actualizarUsuario(String target, ArrayList<String> newLines) {
-	     // Sobrescribir archivo con los datos actualizados
-	     try (BufferedWriter writer = new BufferedWriter(new FileWriter(target))) {
-	    	 for (String l : newLines) {
-	    		 writer.write(l);
-	             writer.newLine();
-	         }
-	    	 ShowMessageHelper.showInfoMessage("Se han actualizado los datos");
-	     } catch (IOException e) {
-	    	 ShowMessageHelper.showErrorMessage("A ocurrido un error actualizando los datos");
-	    	 e.printStackTrace();
-	     }
-	 }
+	public static void update(String target, ArrayList<String> newLines) {
+		// Sobrescribir archivo con los datos actualizados
+		upsertData(
+			target,
+			newLines,
+			"Se han actualizado los datos",
+			"A ocurrido un error actualizando los datos"
+		);
+	}
+
+	private static void upsertData(String target, ArrayList<String> lines, String infoMessage, String errorMessage){
+	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(target))) {
+			for (String line : lines) {
+	    		writer.write(line);
+	            writer.newLine();
+	        }
+
+	    	ShowMessageHelper.showInfoMessage(infoMessage);
+	    } catch (IOException e) {
+	    	ShowMessageHelper.showErrorMessage(errorMessage);
+	    	e.printStackTrace();
+	    }
+	}
 }

@@ -1,9 +1,5 @@
 package models;
 
-import java.util.ArrayList;
-
-import helpers.UpsertDataHelper;
-
 public class Administrador extends Cuenta {
     public Administrador(String usuario, String password, String correo, String tipo) {
         super(usuario, password, correo, tipo);

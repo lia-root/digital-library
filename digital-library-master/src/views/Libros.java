@@ -170,6 +170,10 @@ public class Libros {
                 ShowMessageHelper.showWarningMessage("Selecciona una fila");
             }
         });
+        preeScreenButton.addActionListener(e -> {
+            MenuAdministrador.showMenu();
+            window.setVisible(false);
+        });
 
         // Carga inicial desde disco/archivo según implementación de Libro.obtenerLibros().
         refreshTable(modelo);
@@ -177,6 +181,7 @@ public class Libros {
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(new EmptyBorder(8, 12, 0, 12));
         topPanel.add(titleLabel, BorderLayout.WEST);
+        topPanel.add(preeScreenButton, BorderLayout.PAGE_START);
 
         // Formulario: GridBagConstraints.weightx=1 en columna 1 estira los JTextField.
         JPanel formPanel = new JPanel(new GridBagLayout());

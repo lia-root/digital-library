@@ -59,6 +59,7 @@ public class Login {
                 userNameTextBox.setText("");
                 userPassBox.setText("");
                 showRolMenu(userName, userPass);
+                window.setVisible(false);
             } else {
                 ShowMessageHelper.showWarningMessage("Los campos de Usuario y Contraseña no pueden estar vacios");
             }
@@ -137,7 +138,6 @@ public class Login {
         // Credenciales de ejemplo: si coinciden, se muestra el panel de administración.
         if(user.equals("root") && pass.equals("1234")){
             MenuAdministrador.showMenu();
-
             return;
         }else{
             for(Cuenta item : Cuenta.obtenerUsuarios()) {
@@ -147,7 +147,7 @@ public class Login {
                     if(item.getTipo().equals("administrador")){
                         MenuAdministrador.showMenu();
                     }else{
-                        //menumiembro
+                        MenuMiembros.showMenu();
                     }
 
                     return;

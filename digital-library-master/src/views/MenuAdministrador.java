@@ -17,6 +17,8 @@ import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
+import static java.awt.SystemColor.window;
+
 /**
  * Menú principal del administrador tras el login: acceso a paneles de usuarios/libros o volver al login.
  */

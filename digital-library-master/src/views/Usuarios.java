@@ -169,11 +169,17 @@ public class Usuarios {
             	ShowMessageHelper.showWarningMessage("Selecciona una fila");
             }
         });
+
+        preeScreenButton.addActionListener(e -> {
+          MenuAdministrador.showMenu();
+          window.setVisible(false);
+        });
         
         refreshTable(modelo);
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(new EmptyBorder(8, 12, 0, 12));
+        topPanel.add(preeScreenButton, BorderLayout.PAGE_START);
         topPanel.add(titleLabel, BorderLayout.WEST);
 
         JPanel formPanel = new JPanel(new GridBagLayout());
@@ -200,7 +206,6 @@ public class Usuarios {
         buttonPanel.add(addUserButton);
         buttonPanel.add(updateTableButton);
         buttonPanel.add(dellUserButton);
-        buttonPanel.add(preeScreenButton);
 
         JPanel formAndButtonsPanel = new JPanel(new BorderLayout());
         formAndButtonsPanel.add(formPanel, BorderLayout.CENTER);
@@ -238,7 +243,9 @@ public class Usuarios {
 			ShowMessageHelper.showErrorMessage(e.getMessage());
 		}
 	}
-
+    /*
+     * Persiste cambios vía {@link Cuenta#eliminaUsuario}; errores se muestran al usuario.
+     */
     private static void dellUser(String id, DefaultTableModel modelo){
         try {
             Cuenta.eliminarUsuario(id);
@@ -247,6 +254,7 @@ public class Usuarios {
         }
         refreshTable(modelo);
     }
+
     /**
      * Reconstruye filas desde la fuente de datos; contraseña mostrada como máscara fija.
      */

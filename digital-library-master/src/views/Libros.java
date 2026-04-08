@@ -17,11 +17,11 @@ import java.util.Date;
 /**
  * Vista CRUD de libros: formulario, tabla y persistencia vía modelo {@link Libro}.
  */
-public class Libros {
+public class Libros extends BaseView{
     /**
      * Arma la ventana completa: título, formulario en rejilla, botones y tabla con scroll.
      */
-    public static void showUserPanel() {
+    public static void show() {
         // Contenedor principal de la pantalla de libros.
         JFrame window = new JFrame("Panel de Libros");
         window.setSize(900, 560);
@@ -71,6 +71,10 @@ public class Libros {
         dellBookButton.setBackground(new Color(120, 130, 200));
         dellBookButton.setForeground(Color.WHITE);
         dellBookButton.setFocusPainted(false);
+
+        preeScreenButton.setBackground(new Color(70, 130, 180));
+        preeScreenButton.setForeground(Color.WHITE);
+        preeScreenButton.setFocusPainted(false);
 
         // DefaultTableModel: filas dinámicas; columnas definidas manualmente.
         DefaultTableModel modelo = new DefaultTableModel();
@@ -171,7 +175,7 @@ public class Libros {
             }
         });
         preeScreenButton.addActionListener(e -> {
-            MenuAdministrador.showMenu();
+            MenuAdministrador.show();
             window.setVisible(false);
         });
 

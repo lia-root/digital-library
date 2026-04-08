@@ -25,11 +25,11 @@ import models.Cuenta;
 /**
  * Vista de gestión de cuentas de usuario: alta, edición en tabla y sincronización con archivos vía {@link Cuenta}.
  */
-public class Usuarios {
+public class Usuarios extends BaseView{
     /**
      * Construye la ventana con el mismo patrón visual que {@link Libros}: norte título, centro formulario+botones, tabla abajo.
      */
-	public static void showUserPanel() {
+	public static void show() {
 		JFrame window = new JFrame("Panel de usuarios");
         window.setSize(900, 560);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -171,7 +171,7 @@ public class Usuarios {
         });
 
         preeScreenButton.addActionListener(e -> {
-          MenuAdministrador.showMenu();
+          MenuAdministrador.show();
           window.setVisible(false);
         });
         

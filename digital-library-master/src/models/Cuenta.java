@@ -40,8 +40,16 @@ public class Cuenta {
 		if (validarUsuarioExistente()) {
 			ShowMessageHelper.showErrorMessage("Ya existe un usuario con ese nombre o correo");
 		}else{
-			UpsertDataHelper.insert("usuario="+getUsuario()+",password="+password+",correo="+getCorreo()+",tipo="+getTipo(), target);
+			if(getTipo().equals("administrador")){
+				UpsertDataHelper.insert("usuario="+getUsuario()+",password="+password+",correo="+getCorreo()+",tipo="+getTipo(), target);
+			}else{
+				Miembro miembro = (Miembro) this;
+				miembro.calcularNuevaFechaVencimiento();
+				UpsertDataHelper.insert("usuario="+getUsuario()+",password="+password+",correo="+getCorreo()+",tipo="+getTipo()+",vencimiento="+miembro.getFechaVencimiento(), target);
+			}
+
 		}
+
 	}
 
 	private boolean validarUsuarioExistente(){
@@ -85,7 +93,16 @@ public class Cuenta {
     		String correo = data[3].split("=")[1];
     		String tipo = data[4].split("=")[1];
 
-    		Cuenta cuenta = (tipo.equals("administrador")) ? new Administrador(nombre, password, correo, tipo) : new Miembro(nombre, password, correo, tipo);
+    		Cuenta cuenta = null;
+			ShowMessageHelper.showInfoMessage(tipo);
+			ShowMessageHelper.showInfoMessage(String.valueOf(tipo.equals("administrador")));
+			if(tipo.equals("administrador")){
+				cuenta = new Administrador(nombre, password, correo, tipo);
+			}else{
+				Miembro objetomiembro =	new Miembro(nombre, password, correo, tipo);
+				objetomiembro.setFechaVencimiento(data[5].split("=")[1]);
+				cuenta = objetomiembro;
+			}
     		cuenta.setUuid(uuid);
     		cuentas.add(cuenta);
     	}
@@ -99,7 +116,14 @@ public class Cuenta {
 
     	for(String item : viejasLineas) {
     		if (item.contains("id=" + id)) {
-    			item = "id="+id+",usuario="+nuevoUsuario+""+",password="+nuevaPassword+",correo="+nuevoCorreo+",tipo="+nuevoTipo;
+				if(nuevoTipo.equals("administrador")) {
+					item = "id=" + id + ",usuario=" + nuevoUsuario + "" + ",password=" + nuevaPassword + ",correo=" + nuevoCorreo + ",tipo=" + nuevoTipo;
+				}else{
+					Miembro miembro = new Miembro(nuevoUsuario,nuevaPassword, nuevoCorreo , nuevoTipo);
+					miembro.calcularNuevaFechaVencimiento();
+
+					item = "id=" + id + ",usuario=" + nuevoUsuario + "" + ",password=" + nuevaPassword + ",correo=" + nuevoCorreo + ",tipo=" + nuevoTipo + ",vencimiento="+miembro.getFechaVencimiento();
+				}
     		}
 
     		nuevasLineas.add(item);

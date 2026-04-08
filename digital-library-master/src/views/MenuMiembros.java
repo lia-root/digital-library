@@ -1,13 +1,15 @@
 package views;
 
 import helpers.CurrentUserHelper;
+import helpers.ShowMessageHelper;
+import models.Miembro;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class MenuMiembros {
-    public static void showMenu() {
+    public static void show() {
         // Ventana del menú; tamaño grande para que los botones no queden cortados al abrir.
         JFrame window = new JFrame("Menu de Miembros");
         window.setSize(860, 560);
@@ -70,25 +72,28 @@ public class MenuMiembros {
         loginButton.setFocusPainted(false);
 
         // Abre otro JFrame y oculta este para no acumular ventanas visibles.
-        /*look4BookButton.addActionListener(e -> {
-            Usuarios.showUserPanel();
-            window.setVisible(false);
+        look4BookButton.addActionListener(e -> {
+        look4BookButton.addActionListener(e -> {
+           Miembro current = (Miembro) CurrentUserHelper.get();
+
+            if (current.ValidarAcceso()){
+                LibroMiembros.show();
+                window.setVisible(false);
+            }
+            else{
+                ShowMessageHelper.showInfoMessage("Acceso expiriado, pide a un administrador que lo active");
+            }
         });
 
-        booksButton.addActionListener(e -> {
-            Libros.showUserPanel();
-            window.setVisible(false);
-        });
-
-         booksButton.addActionListener(e -> {
-            Libros.showUserPanel();
+        perfilButton.addActionListener(e -> {
+            Perfil.show();
             window.setVisible(false);
         });
 
         loginButton.addActionListener(e -> {
-            Login.ShowLogin();
+            Login.show();
             window.setVisible(false);
-        });*/
+        });
 
         // Contenido vertical: título, espacio, subtítulo, botones cada uno en fila centrada con FlowLayout.
         JPanel contentPanel = new JPanel();

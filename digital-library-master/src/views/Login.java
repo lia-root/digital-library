@@ -17,11 +17,11 @@ import models.Cuenta;
 /**
  * Pantalla de inicio de sesión: construye la ventana, valida campos y delega el acceso al menú según credenciales.
  */
-public class Login {
+public class Login extends BaseView{
     /**
      * Crea y muestra la ventana de login con estilo tipo “tarjeta” centrada.
      */
-	public static void ShowLogin() {
+	public static void show() {
         // Ventana principal del formulario de acceso.
         JFrame window = new JFrame("Login");
         // Tamaño inicial razonable para el contenido sin recortes.
@@ -137,7 +137,7 @@ public class Login {
     private static void showRolMenu(String user, String pass){
         // Credenciales de ejemplo: si coinciden, se muestra el panel de administración.
         if(user.equals("root") && pass.equals("1234")){
-            MenuAdministrador.showMenu();
+            MenuAdministrador.show();
             return;
         }else{
             for(Cuenta item : Cuenta.obtenerUsuarios()) {
@@ -145,9 +145,9 @@ public class Login {
                     CurrentUserHelper.set(item);
 
                     if(item.getTipo().equals("administrador")){
-                        MenuAdministrador.showMenu();
+                        MenuAdministrador.show();
                     }else{
-                        MenuMiembros.showMenu();
+                        MenuMiembros.show();
                     }
 
                     return;

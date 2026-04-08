@@ -1,42 +1,24 @@
 package models;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 
+import helpers.ShowMessageHelper;
 import helpers.UpsertDataHelper;
 
 public class Miembro extends Cuenta {
     private String status;
+    private String fechaVencimiento; //DD/MM/AAAA
+
     private ArrayList<Reserva> misReservas;
 
     public Miembro(String usuario, String password, String correo, String tipo) {
         super(usuario, password, correo, tipo);
         this.status = "activo";
         this.misReservas = new ArrayList<>();
-    }
-
-    public void reservar_libro(Libro libro, Catalogo catalogo, String fecha_inicio, String fecha_fin) {
-        if (!"activo".equalsIgnoreCase(status))
-            throw new IllegalStateException("No puede reservar: su cuenta no esta"
-                    + " activa.");
-        if (libro == null)
-            throw new IllegalArgumentException("Se espera un Libro para 'libro', no puede ser nulo");
-        if (catalogo == null)
-            throw new IllegalArgumentException("Se espera un Catalogo para 'catalogo', no puede ser nulo");
-        if (catalogo.libros == null || !catalogo.libros.contains(libro))
-            throw new IllegalArgumentException("El libro no está en el catálogo.");
-        if (!Reserva.esFechaValida(fecha_inicio) || !Reserva.esFechaValida(fecha_fin))
-            throw new IllegalArgumentException("Se esperan fechas en formato yyyy-MM-dd (cadena). Ejemplo: 2025-02-18");
-        String periodo = fecha_inicio + " a " + fecha_fin;
-        Reserva r = new Reserva(periodo, true, libro, this, fecha_inicio, fecha_fin);
-        misReservas.add(r);
-        System.out.println("Reserva realizada: " + libro.getAutor() + " del " + periodo);
-    }
-
-    public void leer_libro(Libro libro) {
-        if (libro == null)
-            throw new IllegalArgumentException("Se espera un Libro para 'libro', no puede ser nulo");
-        libro.abrir();
-        System.out.println("Leyendo: " + libro.getAutor() + " - " + libro.categoria);
     }
 
     public void historial() {
@@ -56,5 +38,34 @@ public class Miembro extends Cuenta {
     }
 
     public void setStatus(String status) { this.status = status; }
-    public String getStatus() { return status; }
+    public String getStatus() { return this.status; }
+
+    public void setFechaVencimiento(String fecha){this.fechaVencimiento = fecha; }
+    public String getFechaVencimiento(){  return this.fechaVencimiento; }
+
+    public void calcularNuevaFechaVencimiento(){
+        String nuevaFechaCalculada = null;
+
+        LocalDate hoy = LocalDate.now();
+        LocalDate nuevaFecha = hoy.plusDays(30);
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        nuevaFechaCalculada = nuevaFecha.format(formatter);
+
+        setFechaVencimiento(nuevaFechaCalculada);
+    }
+
+    public boolean ValidarAcceso(){
+        try{
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+
+            LocalDate fecha1 = LocalDate.now();
+            LocalDate fecha2 = LocalDate.parse(getFechaVencimiento(), formatter);
+
+            return fecha1.isAfter(fecha2) ? true : false;
+
+        }catch (Exception e){
+            return false;
+        }
+    }
 }

@@ -1,7 +1,9 @@
 package views;
 
-import helpers.ShowMessageHelper;
+import helpers.CurrentUserHelper;
+import helpers.UserHistorialHelper;
 import models.Libro;
+import models.Miembro;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -9,6 +11,8 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 
 public class LibroMiembros extends BaseView{
@@ -28,14 +32,14 @@ public class LibroMiembros extends BaseView{
 
         // Campos de texto por columna del libro (coinciden con columnas de tabla más abajo).
         JLabel bookTitleLabel = new JLabel("Busqueda:");
-        JTextField bookTitleTextBox = new JTextField(15);
+        JTextField searchBookTextBox = new JTextField(15);
 
-        JButton addBookButton = new JButton("Buscar");
+        JButton searchBookButton = new JButton("Buscar");
         JButton preeScreenButton = new JButton("Menu anterior");
 
-        addBookButton.setBackground(new Color(46, 139, 87));
-        addBookButton.setForeground(Color.WHITE);
-        addBookButton.setFocusPainted(false);
+        searchBookButton.setBackground(new Color(46, 139, 87));
+        searchBookButton.setForeground(Color.WHITE);
+        searchBookButton.setFocusPainted(false);
 
         preeScreenButton.setBackground(new Color(70, 130, 180));
         preeScreenButton.setForeground(Color.WHITE);
@@ -61,19 +65,22 @@ public class LibroMiembros extends BaseView{
         JScrollPane scroll = new JScrollPane(tabla);
         scroll.setBorder(BorderFactory.createTitledBorder("Listado de libros"));
 
-        // Alta: convierte la fecha del spinner a String con el mismo patrón que el editor.
-        addBookButton.addActionListener(e -> {
+       searchBookButton.addActionListener(e -> {
+           refreshTable(modelo,searchBookTextBox.getText());
         });
 
-        // Clic en fila: rellena el formulario para editar; -1 = ninguna fila válida.
         tabla.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
-          int fila = tabla.getSelectedRow();
-          if (fila == -1) {
-              return;
-          }
-          Contenido.show(modelo.getValueAt(fila, 0).toString());
-          window.setVisible(false);
+                int fila = tabla.getSelectedRow();
+
+                if (fila == -1) return;
+
+                String idBook = modelo.getValueAt(fila, 0).toString();
+
+                Contenido.show(idBook);
+                saveOnHistorial(idBook);
+
+                window.setVisible(false);
             }
         });
 
@@ -82,15 +89,13 @@ public class LibroMiembros extends BaseView{
             window.setVisible(false);
         });
 
-        // Carga inicial desde disco/archivo según implementación de Libro.obtenerLibros().
-        refreshTable(modelo);
+        refreshTable(modelo, "");
 
         JPanel topPanel = new JPanel(new BorderLayout());
         topPanel.setBorder(new EmptyBorder(8, 12, 0, 12));
         topPanel.add(titleLabel, BorderLayout.WEST);
         topPanel.add(preeScreenButton, BorderLayout.PAGE_START);
 
-        // Formulario: GridBagConstraints.weightx=1 en columna 1 estira los JTextField.
         JPanel formPanel = new JPanel(new GridBagLayout());
         formPanel.setBorder(new EmptyBorder(0, 12, 0, 12));
         GridBagConstraints gbc = new GridBagConstraints();
@@ -99,15 +104,13 @@ public class LibroMiembros extends BaseView{
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
         gbc.gridx = 0; gbc.gridy = 0; formPanel.add(bookTitleLabel, gbc);
-        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(bookTitleTextBox, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(searchBookTextBox, gbc);
 
-        // Botones alineados a la derecha bajo el formulario.
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
 
         buttonPanel.setBorder(new EmptyBorder(8, 0, 8, 0));
-        buttonPanel.add(addBookButton);
+        buttonPanel.add(searchBookButton);
 
-        // Formulario + botones en NORTH del centro; tabla en CENTER ocupa el resto (scroll).
         JPanel formAndButtonsPanel = new JPanel(new BorderLayout());
         formAndButtonsPanel.add(formPanel, BorderLayout.CENTER);
         formAndButtonsPanel.add(buttonPanel, BorderLayout.SOUTH);
@@ -122,13 +125,29 @@ public class LibroMiembros extends BaseView{
 
         window.setVisible(true);
     }
-    public static void refreshTable(DefaultTableModel modelo) {
+
+    public static void refreshTable(DefaultTableModel modelo, String text) {
         modelo.setRowCount(0);
 
         ArrayList<Libro> libros = Libro.obtenerLibros();
 
         for(Libro libro : libros) {
-            modelo.addRow(new Object[]{ libro.getUuid(), libro.getLTitulo(), libro.getAutor(), libro.getEditorial(), libro.getExpedicion(),libro.getCategoria()});
+            if(text != null || !text.isBlank() || !text.isEmpty()){
+                if(libro.getAutor().contains(text) || libro.getLTitulo().contains(text) || libro.getCategoria().contains(text) || libro.getEditorial().contains(text)){
+                    modelo.addRow(new Object[]{libro.getUuid(), libro.getLTitulo(), libro.getAutor(), libro.getEditorial(), libro.getExpedicion(), libro.getCategoria()});
+                }
+            }else {
+                modelo.addRow(new Object[]{libro.getUuid(), libro.getLTitulo(), libro.getAutor(), libro.getEditorial(), libro.getExpedicion(), libro.getCategoria()});
+            }
         }
+    }
+
+    private static void saveOnHistorial(String idBook){
+        Miembro currentUser = (Miembro) CurrentUserHelper.get();
+
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+
+        UserHistorialHelper.add("user_id="+currentUser.getUuid()+",libro_id="+idBook+",fecha="+now.format(format));
     }
 }

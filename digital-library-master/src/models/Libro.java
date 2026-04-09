@@ -10,10 +10,9 @@ public class Libro {
     private String expedicion;
     private String editorial;
     public String categoria;
-    private int paginaActual;
-    private boolean abierto;
     public String titulo;
     private String uuid;
+    private String fechaDeLectua;
 
     public Libro(String tiitulo, String autor, String expedicion, String editorial, String categoria) {
         if (autor == null || autor.isBlank())
@@ -26,37 +25,7 @@ public class Libro {
         this.expedicion = expedicion != null ? expedicion : "";
         this.editorial = editorial;
         this.categoria = categoria;
-        this.paginaActual = 1;
-        this.abierto = false;
         this.titulo =tiitulo;
-    }
-    public void ficha_bibliografica() {
-        System.out.println("=== Ficha bibliografica ===");
-        System.out.println("Titulo: " + (titulo != null ? titulo : "N/A"));
-        System.out.println("Autor: " + (autor != null ? autor : "N/A"));
-        System.out.println("Expedicion: " + (expedicion != null ? expedicion : "N/A"));
-        System.out.println("Editorial: " + (editorial != null ? editorial : "N/A"));
-        System.out.println("Categoria: " + (categoria != null ? categoria : "N/A"));
-
-    }
-
-    public void abrir() {
-        abierto = true;
-        paginaActual = 1;
-        System.out.println("Libro abierto en la pagina " + paginaActual);
-    }
-
-    public void cerrar() {
-        abierto = false;
-        System.out.println("Libro cerrado. Ultima pagina vista: " + paginaActual);
-    }
-
-    public void pasar_pagina() {
-        if (!abierto) {
-            throw new IllegalStateException("El libro esta cerrado. Abrelo primero.");
-        }
-        paginaActual++;
-        System.out.println("Pagina actual: " + paginaActual);
     }
 
     public String getAutor() { return autor; }
@@ -66,10 +35,13 @@ public class Libro {
     public String getExpedicion(){return expedicion;}
     public void setUuid(String uuid) { this.uuid = uuid; }
     public String getUuid() { return this.uuid;}
+    public void setFechaDeLectua(String fechaDeLectua) { this.fechaDeLectua = fechaDeLectua; }
+    public String getFechaDeLectua() { return this.fechaDeLectua; }
 
-        public void guardarLibro() {
+    public void guardarLibro() {
         UpsertDataHelper.insert("titulo="+getLTitulo()+",autor="+getAutor()+",editorial="+getEditorial()+",publicacion="+getExpedicion()+",categoria="+getCategoria(), target);
     }
+
     public static void actualizarLibro(String id, String nuevoTitulo, String nuevoAutor, String nuevaEditorial,String nuevaExpedicion, String nuevaCategoria) {
         ArrayList<String> viejasLineas = UpsertDataHelper.read(target);
         ArrayList<String> nuevasLineas = new ArrayList<>();
@@ -84,6 +56,7 @@ public class Libro {
 
         UpsertDataHelper.update(target, nuevasLineas);
     }
+
     public static void eliminarLibro(String id) {
         ArrayList<String> viejasLineas = UpsertDataHelper.read(target);
         ArrayList<String> nuevasLineas = new ArrayList<>();
@@ -97,6 +70,7 @@ public class Libro {
         }
         UpsertDataHelper.update(target, nuevasLineas);
     }
+
     public static ArrayList<Libro> obtenerLibros() {
         ArrayList<String> datos = UpsertDataHelper.read(target);
         ArrayList<Libro> libros = new ArrayList<>();
@@ -125,5 +99,18 @@ public class Libro {
         }
 
         return libros;
+    }
+
+    public static Libro encontrarLibro(String libroId){
+        Libro libro = null;
+
+        for(Libro item : obtenerLibros()){
+            if (item.getUuid().equals(libroId)){
+                libro = item;
+                break;
+            }
+        }
+
+        return libro;
     }
 }

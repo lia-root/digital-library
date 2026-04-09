@@ -1,7 +1,10 @@
 package views;
 
 import helpers.CurrentUserHelper;
+import helpers.UserHistorialHelper;
 import models.Cuenta;
+import models.Libro;
+import models.Miembro;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -10,6 +13,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.net.URL;
+import java.util.ArrayList;
 
 /**
  * Vista de perfil de miembro: foto, datos de cuenta e historial de lectura, con el mismo lenguaje visual que Login y paneles CRUD.
@@ -25,11 +29,11 @@ public class Perfil extends BaseView{
 
     public static void show() {
 
-        Cuenta user = CurrentUserHelper.get();
+        Miembro user = (Miembro) CurrentUserHelper.get();
 
         JFrame window = new JFrame("Mi Perfil");
-        window.setSize(900, 560);
-        window.setMinimumSize(new Dimension(820, 520));
+        window.setSize(1040, 640);
+        window.setMinimumSize(new Dimension(920, 580));
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setLocationRelativeTo(null);
         window.setLayout(new BorderLayout(12, 12));
@@ -62,6 +66,7 @@ public class Perfil extends BaseView{
                 BorderFactory.createLineBorder(BORDER_CARD),
                 new EmptyBorder(20, 22, 22, 22)
         ));
+
         containerPanel.setBackground(Color.WHITE);
 
         JLabel subtitleLabel = new JLabel("Consulta tu informacion y actividad reciente");
@@ -162,19 +167,6 @@ public class Perfil extends BaseView{
         infoPanel.add(v3, gbc);
 
         gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.weightx = 0;
-        JLabel l4 = new JLabel("Fecha activacion:");
-        l4.setFont(labelFont);
-        l4.setForeground(TEXT_MUTED);
-        infoPanel.add(l4, gbc);
-        gbc.gridx = 1;
-        gbc.weightx = 1;
-        JLabel v4 = new JLabel("20/03/2023");
-        v4.setFont(valueFont);
-        infoPanel.add(v4, gbc);
-
-        gbc.gridx = 0;
         gbc.gridy = 4;
         gbc.weightx = 0;
         JLabel l5 = new JLabel("Fecha vencimiento:");
@@ -183,14 +175,19 @@ public class Perfil extends BaseView{
         infoPanel.add(l5, gbc);
         gbc.gridx = 1;
         gbc.weightx = 1;
-        JLabel v5 = new JLabel("20/03/2024");
+        JLabel v5 = new JLabel(user.getFechaVencimiento());
         v5.setFont(valueFont);
         infoPanel.add(v5, gbc);
 
-        String[] columnas = {"Titulo", "Autor", "Fecha"};
-        DefaultTableModel model = new DefaultTableModel(columnas, 0);
-        model.addRow(new Object[]{"1984", "George Orwell", "15/03/2024"});
-        model.addRow(new Object[]{"El principito", "Antoine de Saint-Exupery", "28/03/2024"});
+        DefaultTableModel model = new DefaultTableModel();
+
+        model.addColumn("ID");
+        model.addColumn("Titulo");
+        model.addColumn("Autor");
+        model.addColumn("Editorial");
+        model.addColumn("Publicacion");
+        model.addColumn("Categoria");
+        model.addColumn("Fecha/Hora de consulta");
 
         JTable table = new JTable(model);
         table.setRowHeight(24);
@@ -198,6 +195,7 @@ public class Perfil extends BaseView{
         table.getTableHeader().setFont(new Font("SansSerif", Font.BOLD, 13));
         table.setSelectionBackground(TABLE_SELECT_BG);
         table.setSelectionForeground(Color.BLACK);
+        table.setPreferredScrollableViewportSize(new Dimension(780, 240));
         JScrollPane scrollPane = new JScrollPane(table);
         scrollPane.setBorder(BorderFactory.createTitledBorder("Historial de lectura"));
 
@@ -222,6 +220,8 @@ public class Perfil extends BaseView{
         gbcMain.fill = GridBagConstraints.BOTH;
 
         cardPanel.add(containerPanel, gbcMain);
+
+        refreshTable(model);
 
         window.add(topPanel, BorderLayout.NORTH);
         window.add(cardPanel, BorderLayout.CENTER);
@@ -267,5 +267,15 @@ public class Perfil extends BaseView{
         }
         Image scaled = raw.getScaledInstance(140, 140, Image.SCALE_SMOOTH);
         photoLabel.setIcon(new ImageIcon(scaled));
+    }
+
+    public static void refreshTable(DefaultTableModel model) {
+        model.setRowCount(0);
+        Miembro miembro = (Miembro) CurrentUserHelper.get();
+        ArrayList<Libro> libros = UserHistorialHelper.get(miembro);
+
+        for(Libro libro : libros) {
+            model.addRow(new Object[]{ libro.getUuid(), libro.getLTitulo(), libro.getAutor(), libro.getEditorial(), libro.getExpedicion(), libro.getCategoria(), libro.getFechaDeLectua()});
+        }
     }
 }

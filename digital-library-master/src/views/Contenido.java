@@ -8,7 +8,6 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class Contenido extends BaseView {
-
     public static void show(String idBook){
         Libro book = searchBook(idBook);
 
@@ -122,6 +121,7 @@ public class Contenido extends BaseView {
                 BorderFactory.createLineBorder(BORDER_CARD),
                 new EmptyBorder(20, 22, 22, 22)
         ));
+
         containerPanel.setBackground(Color.WHITE);
         containerPanel.add(centerPanel, BorderLayout.CENTER);
 
@@ -137,6 +137,7 @@ public class Contenido extends BaseView {
         window.add(cardPanel, BorderLayout.CENTER);
         window.setVisible(true);
     }
+
     public static String area(){
         return " Lorem ipsum dolor sit amet, consectetur adipiscing elit. Proin condimentum bibendum nibh, ut faucibus risus accumsan quis. Nullam efficitur sagittis lorem vel lacinia. Nunc fringilla, elit in sodales lobortis, ex justo porta lectus, a fringilla erat dolor vitae arcu. Integer euismod enim ac libero interdum, nec volutpat ipsum hendrerit. Vestibulum nisl sapien, rhoncus eu quam interdum, tincidunt euismod risus. Integer sodales ipsum a enim condimentum, a tempor nunc luctus. Nullam elementum hendrerit bibendum. In ac vulputate mi, et tincidunt nisi. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Nulla non diam a felis sagittis rutrum non quis augue. Nulla non purus accumsan libero pretium malesuada. Morbi ullamcorper mauris leo.\n" +
                 "\n" +
@@ -152,9 +153,10 @@ public class Contenido extends BaseView {
                 "\n" +
                 "Nam quis hendrerit felis, vitae dignissim nisi. Suspendisse potenti. Aenean euismod suscipit mauris, vitae posuere lacus efficitur nec. Pellentesque eu viverra eros, sit amet venenatis tellus. Sed dictum, diam et blandit commodo, nulla nisi eleifend ligula, sed tincidunt arcu tortor a quam. In ac varius lectus. Pellentesque erat mi, tristique ut lacus vel, venenatis feugiat nunc. Phasellus vel dolor dignissim, condimentum enim fringilla, consectetur tortor. Nullam auctor viverra enim vitae molestie. Sed malesuada euismod ornare. Mauris sit amet mi tempor, scelerisque ex in, imperdiet arcu. ";
     }
+
     public static Libro searchBook(String id) {
         ArrayList<Libro> catalogo = Libro.obtenerLibros();
-        Libro libro=null;
+        Libro libro = null;
 
         for (Libro item : catalogo) {
             if (item.getUuid().equals(id)) {
@@ -162,6 +164,7 @@ public class Contenido extends BaseView {
                break;
             }
         }
+
         return libro;
     }
 }

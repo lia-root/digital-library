@@ -10,35 +10,12 @@ import helpers.ShowMessageHelper;
 import helpers.UpsertDataHelper;
 
 public class Miembro extends Cuenta {
-    private String status;
     private String fechaVencimiento; //DD/MM/AAAA
 
-    private ArrayList<Reserva> misReservas;
-
+    //TODO ratrear
     public Miembro(String usuario, String password, String correo, String tipo) {
         super(usuario, password, correo, tipo);
-        this.status = "activo";
-        this.misReservas = new ArrayList<>();
     }
-
-    public void historial() {
-        if (misReservas == null || misReservas.isEmpty()) {
-            System.out.println("No tiene reservas en su historial.");
-            return;
-        }
-        System.out.println("=== Historial de reservas ===");
-        for (Reserva r : misReservas) {
-            try {
-                boolean vigente = r.vigencia_reserva();
-                System.out.println("- " + r.getLibro().getAutor() + " | " + r.getFechaInicio() + " a " + r.getFechaFin() + " | Vigente: " + vigente);
-            } catch (IllegalArgumentException e) {
-                System.err.println("- Reserva con fecha invalida: " + e.getMessage());
-            }
-        }
-    }
-
-    public void setStatus(String status) { this.status = status; }
-    public String getStatus() { return this.status; }
 
     public void setFechaVencimiento(String fecha){this.fechaVencimiento = fecha; }
     public String getFechaVencimiento(){  return this.fechaVencimiento; }
@@ -62,7 +39,7 @@ public class Miembro extends Cuenta {
             LocalDate fecha1 = LocalDate.now();
             LocalDate fecha2 = LocalDate.parse(getFechaVencimiento(), formatter);
 
-            return fecha1.isAfter(fecha2) ? true : false;
+            return fecha1.isBefore(fecha2) ? true : false;
 
         }catch (Exception e){
             return false;

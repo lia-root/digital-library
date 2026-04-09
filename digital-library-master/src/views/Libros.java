@@ -14,13 +14,9 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-/**
- * Vista CRUD de libros: formulario, tabla y persistencia vía modelo {@link Libro}.
- */
+
 public class Libros extends BaseView{
-    /**
-     * Arma la ventana completa: título, formulario en rejilla, botones y tabla con scroll.
-     */
+
     public static void show() {
         // Contenedor principal de la pantalla de libros.
         JFrame window = new JFrame("Panel de Libros");
@@ -30,12 +26,11 @@ public class Libros extends BaseView{
         // Gaps horizontales/verticales entre regiones NORTH y CENTER.
         window.setLayout(new BorderLayout(12, 12));
 
-        // Encabezado de sección (solo texto, región norte).
+
         JLabel titleLabel = new JLabel("Registro de libros");
         titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
         titleLabel.setBorder(new EmptyBorder(8, 4, 0, 4));
 
-        // Campos de texto por columna del libro (coinciden con columnas de tabla más abajo).
         JLabel bookTitleLabel = new JLabel("Titulo");
         JTextField bookTitleTextBox = new JTextField(15);
 
@@ -45,15 +40,15 @@ public class Libros extends BaseView{
         JLabel bookEditorialLabel = new JLabel("Editorial");
         JTextField editorialTextBox = new JTextField(15);
 
-        // Fecha con JSpinner + modelo de fecha: evita texto libre y formatea con DateEditor.
         JLabel publicationDateLabel = new JLabel("Fecha de publicacion");
         JSpinner publicationDateSpinner = new JSpinner(new SpinnerDateModel());
         publicationDateSpinner.setEditor(new JSpinner.DateEditor(publicationDateSpinner, "dd-MM-yyyy"));
         publicationDateSpinner.setValue(new Date());
 
         JLabel bookCategoryLabel = new JLabel("Categoria");
-        JTextField categoryTextBox = new JTextField(15);
-
+        String[] categoryOptions = {"Novela", "Ciencia", "Historia", "Tecnologia", "Arte", "Infantil", "Otro"};
+        JComboBox<String> categoryComboBox = new JComboBox<>(categoryOptions);
+        categoryComboBox.setSelectedIndex(-1);
 
         JButton addBookButton = new JButton("Agregar");
         JButton updateTableButton = new JButton("Actualizar");
@@ -76,7 +71,6 @@ public class Libros extends BaseView{
         preeScreenButton.setForeground(Color.WHITE);
         preeScreenButton.setFocusPainted(false);
 
-        // DefaultTableModel: filas dinámicas; columnas definidas manualmente.
         DefaultTableModel modelo = new DefaultTableModel();
 
         modelo.addColumn("ID");
@@ -98,19 +92,21 @@ public class Libros extends BaseView{
         // Alta: convierte la fecha del spinner a String con el mismo patrón que el editor.
         addBookButton.addActionListener(e -> {
             String publicationDate = new SimpleDateFormat("dd-MM-yyyy").format((Date) publicationDateSpinner.getValue());
+            String selectedCategory = (String) categoryComboBox.getSelectedItem();
             boolean textBoxEmpty = bookTitleTextBox.getText().isEmpty() || authorTextBox.getText().isEmpty() || editorialTextBox.getText().isEmpty()
-                    || publicationDate.isEmpty() || categoryTextBox.getText().isEmpty();
+                    || publicationDate.isEmpty() || selectedCategory == null || selectedCategory.isEmpty();
             if (textBoxEmpty) {
                 ShowMessageHelper.showWarningMessage("Por favor, llena todos los campos");
             } else {
-                addBook(bookTitleTextBox.getText(), authorTextBox.getText(), editorialTextBox.getText(), publicationDate, categoryTextBox.getText(),  modelo);
+                addBook(bookTitleTextBox.getText(), authorTextBox.getText(), editorialTextBox.getText(), publicationDate, selectedCategory,  modelo);
                 bookTitleTextBox.setText("");
                 authorTextBox.setText("");
                 editorialTextBox.setText("");
-                categoryTextBox.setText("");
+                categoryComboBox.setSelectedIndex(-1);
                 publicationDateSpinner.setValue(new Date());
             }
         });
+
         dellBookButton.addActionListener(e -> {
             int fila = tabla.getSelectedRow();
 
@@ -120,7 +116,7 @@ public class Libros extends BaseView{
                 bookTitleTextBox.setText("");
                 authorTextBox.setText("");
                 editorialTextBox.setText("");
-                categoryTextBox.setText("");
+                categoryComboBox.setSelectedIndex(-1);
                 publicationDateSpinner.setValue(new Date());
                 ShowMessageHelper.showInfoMessage("Libro eliminado");
 
@@ -133,20 +129,31 @@ public class Libros extends BaseView{
         tabla.addMouseListener(new MouseAdapter() {
             public void mouseClicked(MouseEvent e) {
                 int fila = tabla.getSelectedRow();
-                if (fila == -1) {
-                    return;
-                }
+                if (fila == -1) return;
 
                 bookTitleTextBox.setText(modelo.getValueAt(fila, 1).toString());
                 authorTextBox.setText(modelo.getValueAt(fila, 2).toString());
                 editorialTextBox.setText(modelo.getValueAt(fila, 3).toString());
+
                 try {
                     Date parsedDate = new SimpleDateFormat("dd-MM-yyyy").parse(modelo.getValueAt(fila, 4).toString());
                     publicationDateSpinner.setValue(parsedDate);
                 } catch (Exception ex) {
                     publicationDateSpinner.setValue(new Date());
                 }
-                categoryTextBox.setText(modelo.getValueAt(fila, 5).toString());
+
+                String selectedCategory = modelo.getValueAt(fila, 5).toString();
+                boolean categoryExists = false;
+                for (int i = 0; i < categoryComboBox.getItemCount(); i++) {
+                    if (categoryComboBox.getItemAt(i).equals(selectedCategory)) {
+                        categoryExists = true;
+                        break;
+                    }
+                }
+                if (!categoryExists) {
+                    categoryComboBox.addItem(selectedCategory);
+                }
+                categoryComboBox.setSelectedItem(selectedCategory);
             }
         });
 
@@ -159,15 +166,20 @@ public class Libros extends BaseView{
                 modelo.setValueAt(authorTextBox.getText(), fila, 2);
                 modelo.setValueAt(editorialTextBox.getText(), fila, 3);
                 String publicationDate = new SimpleDateFormat("dd-MM-yyyy").format((Date) publicationDateSpinner.getValue());
+                String selectedCategory = (String) categoryComboBox.getSelectedItem();
+                if (selectedCategory == null || selectedCategory.isEmpty()) {
+                    ShowMessageHelper.showWarningMessage("Selecciona una categoria");
+                    return;
+                }
                 modelo.setValueAt(publicationDate, fila, 4);
-                modelo.setValueAt(categoryTextBox.getText(), fila, 5);
+                modelo.setValueAt(selectedCategory, fila, 5);
 
-                updateBook(modelo.getValueAt(fila, 0).toString(), bookTitleTextBox.getText(), authorTextBox.getText(), editorialTextBox.getText(), publicationDate, categoryTextBox.getText());
+                updateBook(modelo.getValueAt(fila, 0).toString(), bookTitleTextBox.getText(), authorTextBox.getText(), editorialTextBox.getText(), publicationDate, selectedCategory);
 
                 bookTitleTextBox.setText("");
                 authorTextBox.setText("");
                 editorialTextBox.setText("");
-                categoryTextBox.setText("");
+                categoryComboBox.setSelectedIndex(-1);
                 publicationDateSpinner.setValue(new Date());
 
             } else {
@@ -208,7 +220,7 @@ public class Libros extends BaseView{
         gbc.gridx = 1; gbc.weightx = 1; formPanel.add(publicationDateSpinner, gbc);
 
         gbc.gridx = 0; gbc.gridy = 4; gbc.weightx = 0; formPanel.add(bookCategoryLabel, gbc);
-        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(categoryTextBox, gbc);
+        gbc.gridx = 1; gbc.weightx = 1; formPanel.add(categoryComboBox, gbc);
 
         // Botones alineados a la derecha bajo el formulario.
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));

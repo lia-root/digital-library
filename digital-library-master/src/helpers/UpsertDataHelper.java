@@ -19,21 +19,21 @@ public class UpsertDataHelper {
 			"Datos guardados correctamente",
 			"A ocurrido un error guardando los datos"
 		);
-    }
+	}
 
 	public static ArrayList<String> read(String target) {
-		ArrayList<String> data = new ArrayList<String>(); 
+		ArrayList<String> data = new ArrayList<String>();
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(target))) {
 			String linea;
 
-	        while ((linea = reader.readLine()) != null) {
+			while ((linea = reader.readLine()) != null) {
 				data.add(linea);
-	        }
-	    } catch (IOException e) {
-	    	ShowMessageHelper.showErrorMessage("No fue posible leer los datos");
-	    	e.printStackTrace();
-	    }
+			}
+		} catch (IOException e) {
+			ShowMessageHelper.showErrorMessage("No fue posible leer los datos");
+			e.printStackTrace();
+		}
 
 		return data;
 	}
@@ -49,16 +49,16 @@ public class UpsertDataHelper {
 	}
 
 	private static void upsertData(String target, ArrayList<String> lines, String infoMessage, String errorMessage){
-	    try (BufferedWriter writer = new BufferedWriter(new FileWriter(target))) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(target))) {
 			for (String line : lines) {
-	    		writer.write(line);
-	            writer.newLine();
-	        }
+				writer.write(line);
+				writer.newLine();
+			}
 
-	    	ShowMessageHelper.showInfoMessage(infoMessage);
-	    } catch (IOException e) {
-	    	ShowMessageHelper.showErrorMessage(errorMessage);
-	    	e.printStackTrace();
-	    }
+			ShowMessageHelper.showInfoMessage(infoMessage);
+		} catch (IOException e) {
+			ShowMessageHelper.showErrorMessage(errorMessage);
+	    e.printStackTrace();
+	  }
 	}
 }

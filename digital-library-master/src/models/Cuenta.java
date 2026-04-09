@@ -1,5 +1,6 @@
 package models;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 import helpers.ShowMessageHelper;
@@ -14,7 +15,7 @@ public class Cuenta {
     private String tipo;
     private String uuid;
 
-    Cuenta(String usuario, String password, String correo, String tipo) {
+    public Cuenta(String usuario, String password, String correo, String tipo) {
         if (usuario == null || usuario.isBlank())
             throw new IllegalArgumentException("Se espera una cadena para 'usuario', no puede ser nula o vacia");
         if (password == null || password.isBlank())
@@ -43,9 +44,9 @@ public class Cuenta {
 			if(getTipo().equals("administrador")){
 				UpsertDataHelper.insert("usuario="+getUsuario()+",password="+password+",correo="+getCorreo()+",tipo="+getTipo(), target);
 			}else{
-				Miembro miembro = (Miembro) this;
+				Miembro miembro = new Miembro(getUsuario(), password, getCorreo(), getTipo());
 				miembro.calcularNuevaFechaVencimiento();
-				UpsertDataHelper.insert("usuario="+getUsuario()+",password="+password+",correo="+getCorreo()+",tipo="+getTipo()+",vencimiento="+miembro.getFechaVencimiento(), target);
+				UpsertDataHelper.insert("usuario="+getUsuario()+",password="+password+",correo="+getCorreo()+",tipo="+getTipo()+",vencimiento="+miembro.getFechaVencimiento()+",creacion="+LocalDate.now(), target);
 			}
 
 		}
@@ -53,6 +54,8 @@ public class Cuenta {
 	}
 
 	private boolean validarUsuarioExistente(){
+		if(getUsuario().equals("root")) return true;
+
 		ArrayList<String> datos = UpsertDataHelper.read(target);
 		boolean existe = false;
 
@@ -94,14 +97,13 @@ public class Cuenta {
     		String tipo = data[4].split("=")[1];
 
     		Cuenta cuenta = null;
-			ShowMessageHelper.showInfoMessage(tipo);
-			ShowMessageHelper.showInfoMessage(String.valueOf(tipo.equals("administrador")));
 			if(tipo.equals("administrador")){
 				cuenta = new Administrador(nombre, password, correo, tipo);
 			}else{
 				Miembro objetomiembro =	new Miembro(nombre, password, correo, tipo);
 				objetomiembro.setFechaVencimiento(data[5].split("=")[1]);
 				cuenta = objetomiembro;
+
 			}
     		cuenta.setUuid(uuid);
     		cuentas.add(cuenta);

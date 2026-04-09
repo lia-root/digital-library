@@ -72,15 +72,14 @@ public class MenuMiembros {
         loginButton.setFocusPainted(false);
 
         // Abre otro JFrame y oculta este para no acumular ventanas visibles.
-        look4BookButton.addActionListener(e -> {
+
         look4BookButton.addActionListener(e -> {
            Miembro current = (Miembro) CurrentUserHelper.get();
 
             if (current.ValidarAcceso()){
                 LibroMiembros.show();
                 window.setVisible(false);
-            }
-            else{
+            } else{
                 ShowMessageHelper.showInfoMessage("Acceso expiriado, pide a un administrador que lo active");
             }
         });

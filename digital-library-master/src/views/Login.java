@@ -12,15 +12,13 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
+
+import models.Administrador;
 import models.Cuenta;
 
-/**
- * Pantalla de inicio de sesión: construye la ventana, valida campos y delega el acceso al menú según credenciales.
- */
+
 public class Login extends BaseView{
-    /**
-     * Crea y muestra la ventana de login con estilo tipo “tarjeta” centrada.
-     */
+
 	public static void show() {
         // Ventana principal del formulario de acceso.
         JFrame window = new JFrame("Login");
@@ -58,8 +56,12 @@ public class Login extends BaseView{
             if (!userName.isEmpty() && !userPass.isEmpty()) {
                 userNameTextBox.setText("");
                 userPassBox.setText("");
-                showRolMenu(userName, userPass);
-                window.setVisible(false);
+                if (showRolMenu(userName, userPass)){
+                    window.setVisible(false);
+                }else{
+                    // Mensaje de error cuando las credenciales no son las esperadas.
+                    ShowMessageHelper.showErrorMessage("Usuario o Contraseña incorrectos");
+                }
             } else {
                 ShowMessageHelper.showWarningMessage("Los campos de Usuario y Contraseña no pueden estar vacios");
             }
@@ -134,27 +136,28 @@ public class Login extends BaseView{
      * @param user nombre ingresado
      * @param pass contraseña ingresada
      */
-    private static void showRolMenu(String user, String pass){
+    private static boolean showRolMenu(String user, String pass){
         // Credenciales de ejemplo: si coinciden, se muestra el panel de administración.
         if(user.equals("root") && pass.equals("1234")){
+            CurrentUserHelper.set(new Administrador("root","1234", "root@email.com","administrador"));
             MenuAdministrador.show();
-            return;
+
+            return true;
         }else{
             for(Cuenta item : Cuenta.obtenerUsuarios()) {
                 if (item.getUsuario().equals(user) && item.comparar_contra(pass)) {
                     CurrentUserHelper.set(item);
-
                     if(item.getTipo().equals("administrador")){
                         MenuAdministrador.show();
                     }else{
                         MenuMiembros.show();
                     }
 
-                    return;
+                    return true;
                 }
             }
         };
-        // Mensaje de error cuando las credenciales no son las esperadas.
-        ShowMessageHelper.showErrorMessage("Usuario o Contraseña incorrectos");
+
+        return false;
     }
 }

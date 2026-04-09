@@ -19,16 +19,8 @@ import javax.swing.border.EmptyBorder;
 
 import static java.awt.SystemColor.window;
 
-/**
- * Menú principal del administrador tras el login: acceso a paneles de usuarios/libros o volver al login.
- */
 public class MenuAdministrador extends BaseView {
-    /**
-     * Construye la ventana con título centrado, botones anchos y datos de sesión arriba a la derecha.
-     *
-     * @param nombreUsuario texto mostrado como identificador
-     * @param rol           rol del usuario (p. ej. "Administrador") para mostrarlo junto al nombre
-     */
+
 	public static void show() {
         // Ventana del menú; tamaño grande para que los botones no queden cortados al abrir.
         JFrame window = new JFrame("Menu de Administrador");

@@ -22,8 +22,8 @@ public class Cuenta {
             throw new IllegalArgumentException("Se espera una cadena para 'password', no puede ser nula o vacia");
         this.usuario = usuario;
         this.password = password;
-        this.correo = correo != null ? correo : "";
-        this.tipo = tipo != null ? tipo : "";
+        this.correo = correo != null && !correo.equals(" ")  ? correo : "";
+        this.tipo = tipo != null && !tipo.equals(" ") ? tipo : "";
     }
 
     public boolean validar_usuario() {
@@ -36,8 +36,39 @@ public class Cuenta {
     public boolean comparar_contra(String password) {return this.password.equals(password);}
     public void setUuid(String uuid) { this.uuid = uuid; }
     public String getUuid() { return this.uuid; }
-    
-    public void guardarUsuario() {
+
+	private boolean validarUsuarioExistente(){
+		if(getUsuario().equals("root")) return true;
+
+		ArrayList<String> datos = UpsertDataHelper.read(target);
+		boolean existe = false;
+
+		for(String item : datos) {
+			/*
+
+
+			[id=e874d408-caab-4726-8f19-69d6e0c36895,usuario=Armando,password=2,correo=elguapo67@gmail.com,tipo=miembro,vencimiento=08/05/2026,creacion=2026-04-08]
+			[id=e874d408-caab-4726-8f19-69d6e0c3685],[[usuario]=[Armando]],[password=2],[correo=elguapo67@gmail.com],[tipo=miembro],[vencimiento=08/05/2026],[creacion=2026-04-08]
+
+
+			*/
+    		String[] data = item.split(",");
+    		String uuid = data[0].split("=")[1];
+    		String nombre = data[1].split("=")[1];
+    		String password = data[2].split("=")[1];
+    		String correo = data[3].split("=")[1];
+    		String tipo = data[4].split("=")[1];
+
+				if (nombre.equals(getUsuario()) || correo.equals(getCorreo())) { //pipe
+					existe = true;
+					break;
+				}
+    	}
+
+		return existe;
+	}
+
+	public void guardarUsuario() {
 		if (validarUsuarioExistente()) {
 			ShowMessageHelper.showErrorMessage("Ya existe un usuario con ese nombre o correo");
 		}else{
@@ -51,29 +82,6 @@ public class Cuenta {
 
 		}
 
-	}
-
-	private boolean validarUsuarioExistente(){
-		if(getUsuario().equals("root")) return true;
-
-		ArrayList<String> datos = UpsertDataHelper.read(target);
-		boolean existe = false;
-
-		for(String item : datos) {
-    		String[] data = item.split(",");
-    		String uuid = data[0].split("=")[1];
-    		String nombre = data[1].split("=")[1];
-    		String password = data[2].split("=")[1];
-    		String correo = data[3].split("=")[1];
-    		String tipo = data[4].split("=")[1];
-
-			if (nombre.equals(getUsuario()) || correo.equals(getCorreo())) {
-				existe = true;
-				break;
-			}
-    	}
-
-		return existe;
 	}
 
     public static ArrayList<Cuenta> obtenerUsuarios() {
@@ -97,17 +105,18 @@ public class Cuenta {
     		String tipo = data[4].split("=")[1];
 
     		Cuenta cuenta = null;
-			if(tipo.equals("administrador")){
-				cuenta = new Administrador(nombre, password, correo, tipo);
-			}else{
-				Miembro objetomiembro =	new Miembro(nombre, password, correo, tipo);
-				objetomiembro.setFechaVencimiento(data[5].split("=")[1]);
-				cuenta = objetomiembro;
 
+					if(tipo.equals("administrador")){
+						cuenta = new Administrador(nombre, password, correo, tipo);
+					}else{
+						Miembro objetomiembro =	new Miembro(nombre, password, correo, tipo);
+						objetomiembro.setFechaVencimiento(data[5].split("=")[1]);
+						cuenta = objetomiembro;
+
+					}
+		        cuenta.setUuid(uuid);
+		        cuentas.add(cuenta);
 			}
-    		cuenta.setUuid(uuid);
-    		cuentas.add(cuenta);
-    	}
 
     	return cuentas;
     }
@@ -118,14 +127,14 @@ public class Cuenta {
 
     	for(String item : viejasLineas) {
     		if (item.contains("id=" + id)) {
-				if(nuevoTipo.equals("administrador")) {
-					item = "id=" + id + ",usuario=" + nuevoUsuario + "" + ",password=" + nuevaPassword + ",correo=" + nuevoCorreo + ",tipo=" + nuevoTipo;
-				}else{
-					Miembro miembro = new Miembro(nuevoUsuario,nuevaPassword, nuevoCorreo , nuevoTipo);
-					miembro.calcularNuevaFechaVencimiento();
+					if(nuevoTipo.equals("administrador")) {
+						item = "id=" + id + ",usuario=" + nuevoUsuario + "" + ",password=" + nuevaPassword + ",correo=" + nuevoCorreo + ",tipo=" + nuevoTipo;
+					}else{
+						Miembro miembro = new Miembro(nuevoUsuario,nuevaPassword, nuevoCorreo , nuevoTipo);
+						miembro.calcularNuevaFechaVencimiento();
 
-					item = "id=" + id + ",usuario=" + nuevoUsuario + "" + ",password=" + nuevaPassword + ",correo=" + nuevoCorreo + ",tipo=" + nuevoTipo + ",vencimiento="+miembro.getFechaVencimiento();
-				}
+						item = "id=" + id + ",usuario=" + nuevoUsuario + "" + ",password=" + nuevaPassword + ",correo=" + nuevoCorreo + ",tipo=" + nuevoTipo + ",vencimiento="+miembro.getFechaVencimiento();
+					}
     		}
 
     		nuevasLineas.add(item);

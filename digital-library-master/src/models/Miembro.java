@@ -12,9 +12,8 @@ import helpers.UpsertDataHelper;
 public class Miembro extends Cuenta {
     private String fechaVencimiento; //DD/MM/AAAA
 
-    //TODO ratrear
     public Miembro(String usuario, String password, String correo, String tipo) {
-        super(usuario, password, correo, tipo);
+        super(usuario, password, correo, tipo);//inicializa el contructor del padre
     }
 
     public void setFechaVencimiento(String fecha){this.fechaVencimiento = fecha; }
@@ -37,7 +36,7 @@ public class Miembro extends Cuenta {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
             LocalDate fecha1 = LocalDate.now();
-            LocalDate fecha2 = LocalDate.parse(getFechaVencimiento(), formatter);
+            LocalDate fecha2 = LocalDate.parse(getFechaVencimiento(), formatter);//puede estar vacio el get y valio kk
 
             return fecha1.isBefore(fecha2) ? true : false;
 

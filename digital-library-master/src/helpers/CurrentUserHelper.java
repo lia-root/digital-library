@@ -11,10 +11,10 @@ import models.Cuenta;
 import models.Miembro;
 
 public class CurrentUserHelper {
-	private static String target = "currentUser.txt";
+	private static String target = "currentUser.txt"; //ruta
 
 	public static Cuenta get() {
-		ArrayList<String> data = new ArrayList<String>(); // TODO: arreglo con apostrofe
+		ArrayList<String> data = new ArrayList<String>();
 
 		try (BufferedReader reader = new BufferedReader(new FileReader(target))) {
 			String linea;
@@ -28,7 +28,7 @@ public class CurrentUserHelper {
 			e.printStackTrace();// TODO: e
 		}
 
-		Cuenta accountFound = new Administrador("root","1234", "root@email.com","administrador");
+		Cuenta accountFound = new Administrador("root","1234", "root@email.com","administrador");//Uduario por Defaul
 
 		for(Cuenta account : Cuenta.obtenerUsuarios()){
 			for(String item : data){
@@ -66,7 +66,6 @@ public class CurrentUserHelper {
 			data.add("id="+newCurrentUser.getUuid()+","+"usuario="+newCurrentUser.getUsuario()+",correo="+newCurrentUser.getCorreo()+",tipo="+newCurrentUser.getTipo()+",vencimiento="+miembro.getFechaVencimiento());
 		}
 
-
 		upsertData(
 			data,
 			"BIENVENIDO",
@@ -80,7 +79,6 @@ public class CurrentUserHelper {
 				writer.write(line);
 				writer.newLine();
 			}
-
 			ShowMessageHelper.showInfoMessage(infoMessage);
 		} catch (IOException e) {
 			ShowMessageHelper.showErrorMessage(errorMessage);

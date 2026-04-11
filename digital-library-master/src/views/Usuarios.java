@@ -140,13 +140,18 @@ public class Usuarios extends BaseView{
               }
 
               fullNameTextBox.setText(modelo.getValueAt(fila, 1).toString());
-              passTextBox.setText(modelo.getValueAt(fila, 2).toString());
+              passTextBox.setText("");
               emailTextBox.setText(modelo.getValueAt(fila, 3).toString());
           }
       });
 
       // Edición: la columna contraseña en tabla pasa a "******" visualmente; el modelo sigue usando passTextBox real al persistir.
       updateTableButton.addActionListener(e -> {
+        boolean textBoxEmpty = fullNameTextBox.getText().isEmpty() || passTextBox.getText().isEmpty() || emailTextBox.getText().isEmpty();
+        if (textBoxEmpty) {
+          ShowMessageHelper.showWarningMessage("Los campos Nombre, Correo electronico y Contraseña no deben estar en blanco");
+          return;
+        }
           int fila = tabla.getSelectedRow();
 
           if (fila != -1) {
@@ -229,10 +234,6 @@ public class Usuarios extends BaseView{
 
 	    refreshTable(modelo);
 	}
-
-    /**
-     * Persiste cambios vía {@link Cuenta#actualizarUsuario}; errores se muestran al usuario.
-     */
 
 	private static void updateUser(String id, String nombre, String contra, String correo, String tipo) {
 		try {
